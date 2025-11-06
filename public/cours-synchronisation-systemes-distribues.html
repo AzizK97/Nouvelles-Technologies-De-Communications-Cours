@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synchronisation dans les Systèmes Distribués</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .definition-box {
+            background: #f0f4ff;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .definition-box strong {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        
+        .example-box {
+            background: #fff8e1;
+            border-left: 5px solid #ffa726;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .example-box h4 {
+            color: #f57c00;
+            margin-bottom: 10px;
+        }
+        
+        .diagram {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .diagram-title {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        
+        svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f0f4ff;
+        }
+        
+        .key-points {
+            background: #e8f5e9;
+            border-left: 5px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .key-points ul {
+            margin-left: 20px;
+        }
+        
+        .key-points li {
+            margin: 10px 0;
+        }
+        
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+        
+        .warning-box {
+            background: #ffebee;
+            border-left: 5px solid #f44336;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .warning-box strong {
+            color: #c62828;
+        }
+        
+        footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        .toc {
+            background: #f9f9f9;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .toc h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .toc a:hover {
+            color: #764ba2;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔄 Synchronisation dans les Systèmes Distribués</h1>
+            <p>Types, Mécanismes et Applications</p>
+        </header>
+        
+        <div class="content">
+            <!-- Table des matières -->
+            <div class="toc">
+                <h3>📋 Table des Matières</h3>
+                <ul>
+                    <li><a href="#introduction">1. Introduction aux Systèmes Distribués</a></li>
+                    <li><a href="#types-sync">2. Types de Synchronisation</a></li>
+                    <li><a href="#upstream-downstream">3. Synchronisation Upstream et Downstream</a></li>
+                    <li><a href="#mecanismes">4. Mécanismes de Synchronisation</a></li>
+                    <li><a href="#comparaison">5. Tableau Comparatif</a></li>
+                    <li><a href="#exemples">6. Exemples Pratiques</a></li>
+                    <li><a href="#cas-etude">7. Cas d'Étude : Plateforme de Réservation (TD)</a></li>
+                    <li><a href="#conclusion">8. Conclusion</a></li>
+                </ul>
+            </div>
+            
+            <!-- Introduction -->
+            <section id="introduction" class="section">
+                <h2>1. Introduction aux Systèmes Distribués</h2>
+                
+                <div class="definition-box">
+                    <strong>Définition :</strong> Un système distribué est un ensemble de composants informatiques autonomes qui apparaissent aux utilisateurs comme un système unique et cohérent. Ces composants communiquent et coordonnent leurs actions en échangeant des messages.
+                </div>
+                
+                <p>
+                    Dans un système distribué, la synchronisation est cruciale pour maintenir la cohérence des données et coordonner les actions entre les différents nœuds. Les défis principaux incluent la latence réseau, les pannes partielles, et les horloges non synchronisées.
+                </p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Figure 1 : Architecture d'un Système Distribué</div>
+                    <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Client -->
+                        <rect x="50" y="150" width="120" height="100" fill="#667eea" rx="10"/>
+                        <text x="110" y="195" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Client</text>
+                        <text x="110" y="215" text-anchor="middle" fill="white" font-size="14">Application</text>
+                        
+                        <!-- Server 1 -->
+                        <rect x="340" y="50" width="120" height="100" fill="#4caf50" rx="10"/>
+                        <text x="400" y="95" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Serveur 1</text>
+                        <text x="400" y="115" text-anchor="middle" fill="white" font-size="14">Base de données</text>
+                        
+                        <!-- Server 2 -->
+                        <rect x="340" y="250" width="120" height="100" fill="#4caf50" rx="10"/>
+                        <text x="400" y="295" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Serveur 2</text>
+                        <text x="400" y="315" text-anchor="middle" fill="white" font-size="14">Base de données</text>
+                        
+                        <!-- Server 3 -->
+                        <rect x="630" y="150" width="120" height="100" fill="#4caf50" rx="10"/>
+                        <text x="690" y="195" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Serveur 3</text>
+                        <text x="690" y="215" text-anchor="middle" fill="white" font-size="14">Base de données</text>
+                        
+                        <!-- Connections -->
+                        <line x1="170" y1="180" x2="340" y2="110" stroke="#764ba2" stroke-width="3"/>
+                        <line x1="170" y1="220" x2="340" y2="290" stroke="#764ba2" stroke-width="3"/>
+                        
+                        <line x1="460" y1="100" x2="630" y2="190" stroke="#ff9800" stroke-width="3" stroke-dasharray="5,5"/>
+                        <line x1="460" y1="300" x2="630" y2="210" stroke="#ff9800" stroke-width="3" stroke-dasharray="5,5"/>
+                        <line x1="400" y1="150" x2="400" y2="250" stroke="#ff9800" stroke-width="3" stroke-dasharray="5,5"/>
+                        
+                        <!-- Labels -->
+                        <text x="250" y="140" text-anchor="middle" fill="#764ba2" font-size="14">Requêtes</text>
+                        <text x="545" y="140" text-anchor="middle" fill="#ff9800" font-size="14">Synchronisation</text>
+                    </svg>
+                </div>
+            </section>
+            
+            <!-- Types de synchronisation -->
+            <section id="types-sync" class="section">
+                <h2>2. Types de Synchronisation</h2>
+                
+                <h3>2.1 Synchronisation Temporelle</h3>
+                <p>
+                    La synchronisation temporelle vise à maintenir une notion cohérente du temps entre les différents nœuds du système. Cela inclut la synchronisation d'horloges physiques et l'utilisation d'horloges logiques.
+                </p>
+                
+                <h3>2.2 Synchronisation de Données</h3>
+                <p>
+                    Ce type de synchronisation assure que les copies de données distribuées restent cohérentes. Elle peut être réalisée de manière synchrone ou asynchrone.
+                </p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Figure 2 : Types de Synchronisation</div>
+                    <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Main box -->
+                        <rect x="250" y="30" width="300" height="60" fill="#667eea" rx="10"/>
+                        <text x="400" y="65" text-anchor="middle" fill="white" font-size="18" font-weight="bold">SYNCHRONISATION</text>
+                        
+                        <!-- Branch lines -->
+                        <line x1="400" y1="90" x2="200" y2="150" stroke="#333" stroke-width="2"/>
+                        <line x1="400" y1="90" x2="400" y2="150" stroke="#333" stroke-width="2"/>
+                        <line x1="400" y1="90" x2="600" y2="150" stroke="#333" stroke-width="2"/>
+                        
+                        <!-- Temporelle -->
+                        <rect x="80" y="150" width="240" height="80" fill="#4caf50" rx="10"/>
+                        <text x="200" y="180" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Temporelle</text>
+                        <text x="200" y="205" text-anchor="middle" fill="white" font-size="13">Horloges physiques</text>
+                        <text x="200" y="220" text-anchor="middle" fill="white" font-size="13">Horloges logiques</text>
+                        
+                        <!-- Données -->
+                        <rect x="340" y="150" width="120" height="80" fill="#ff9800" rx="10"/>
+                        <text x="400" y="180" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Données</text>
+                        <text x="400" y="205" text-anchor="middle" fill="white" font-size="13">Réplication</text>
+                        <text x="400" y="220" text-anchor="middle" fill="white" font-size="13">Cohérence</text>
+                        
+                        <!-- Processus -->
+                        <rect x="480" y="150" width="240" height="80" fill="#e91e63" rx="10"/>
+                        <text x="600" y="180" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Processus</text>
+                        <text x="600" y="205" text-anchor="middle" fill="white" font-size="13">Coordination</text>
+                        <text x="600" y="220" text-anchor="middle" fill="white" font-size="13">Exclusion mutuelle</text>
+                        
+                        <!-- Sub-branches for Données -->
+                        <line x1="400" y1="230" x2="300" y2="300" stroke="#333" stroke-width="2"/>
+                        <line x1="400" y1="230" x2="500" y2="300" stroke="#333" stroke-width="2"/>
+                        
+                        <!-- Upstream -->
+                        <rect x="180" y="300" width="240" height="80" fill="#9c27b0" rx="10"/>
+                        <text x="300" y="330" text-anchor="middle" fill="white" font-size="16" font-weight="bold">⬆️ UPSTREAM</text>
+                        <text x="300" y="355" text-anchor="middle" fill="white" font-size="13">Source → Cible</text>
+                        <text x="300" y="370" text-anchor="middle" fill="white" font-size="13">Push</text>
+                        
+                        <!-- Downstream -->
+                        <rect x="440" y="300" width="240" height="80" fill="#00bcd4" rx="10"/>
+                        <text x="560" y="330" text-anchor="middle" fill="white" font-size="16" font-weight="bold">⬇️ DOWNSTREAM</text>
+                        <text x="560" y="355" text-anchor="middle" fill="white" font-size="13">Cible ← Source</text>
+                        <text x="560" y="370" text-anchor="middle" fill="white" font-size="13">Pull</text>
+                        
+                        <!-- Additional info -->
+                        <text x="400" y="430" text-anchor="middle" fill="#666" font-size="14" font-style="italic">Synchronisation bidirectionnelle possible</text>
+                        <line x1="300" y1="380" x2="560" y2="380" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <line x1="560" y1="395" x2="300" y2="395" stroke="#666" stroke-width="2" marker-end="url(#arrowhead2)"/>
+                        
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#666"/>
+                            </marker>
+                            <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#666"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </section>
+            
+            <!-- Upstream et Downstream -->
+            <section id="upstream-downstream" class="section">
+                <h2>3. Synchronisation Upstream et Downstream</h2>
+                
+                <h3>3.1 Synchronisation Upstream (Montante)</h3>
+                
+                <div class="definition-box">
+                    <strong>Upstream :</strong> La synchronisation upstream (ou montante) fait référence au processus de transfert de données ou de modifications depuis une source locale vers une destination distante ou centrale. C'est un mouvement "vers le haut" dans la hiérarchie des systèmes.
+                </div>
+                
+                <p><strong>Caractéristiques principales :</strong></p>
+                <ul style="margin-left: 40px;">
+                    <li>Initiative de la source : le système local pousse (push) les modifications</li>
+                    <li>Propagation proactive des changements</li>
+                    <li>Utilisé pour mettre à jour un système central ou maître</li>
+                    <li>Latence potentiellement plus faible pour la propagation</li>
+                </ul>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Figure 3 : Synchronisation Upstream (Push)</div>
+                    <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Local nodes -->
+                        <circle cx="150" cy="300" r="50" fill="#9c27b0" stroke="#fff" stroke-width="3"/>
+                        <text x="150" y="295" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Nœud</text>
+                        <text x="150" y="315" text-anchor="middle" fill="white" font-size="14">Local A</text>
+                        
+                        <circle cx="350" cy="300" r="50" fill="#9c27b0" stroke="#fff" stroke-width="3"/>
+                        <text x="350" y="295" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Nœud</text>
+                        <text x="350" y="315" text-anchor="middle" fill="white" font-size="14">Local B</text>
+                        
+                        <circle cx="650" cy="300" r="50" fill="#9c27b0" stroke="#fff" stroke-width="3"/>
+                        <text x="650" y="295" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Nœud</text>
+                        <text x="650" y="315" text-anchor="middle" fill="white" font-size="14">Local C</text>
+                        
+                        <!-- Central server -->
+                        <rect x="325" y="50" width="150" height="100" fill="#667eea" rx="10"/>
+                        <text x="400" y="90" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Serveur</text>
+                        <text x="400" y="115" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Central</text>
+                        
+                        <!-- Arrows -->
+                        <defs>
+                            <marker id="arrow1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#4caf50"/>
+                            </marker>
+                        </defs>
+                        
+                        <line x1="180" y1="260" x2="360" y2="160" stroke="#4caf50" stroke-width="4" marker-end="url(#arrow1)"/>
+                        <line x1="370" y1="250" x2="390" y2="160" stroke="#4caf50" stroke-width="4" marker-end="url(#arrow1)"/>
+                        <line x1="620" y1="260" x2="440" y2="160" stroke="#4caf50" stroke-width="4" marker-end="url(#arrow1)"/>
+                        
+                        <!-- Labels -->
+                        <text x="250" y="200" fill="#4caf50" font-size="14" font-weight="bold">PUSH</text>
+                        <text x="380" y="200" fill="#4caf50" font-size="14" font-weight="bold">PUSH</text>
+                        <text x="520" y="200" fill="#4caf50" font-size="14" font-weight="bold">PUSH</text>
+                        
+                        <!-- Data indicators -->
+                        <circle cx="150" cy="240" r="8" fill="#ffd700"/>
+                        <text x="150" y="230" text-anchor="middle" fill="#333" font-size="12">Données</text>
+                        
+                        <circle cx="350" cy="240" r="8" fill="#ffd700"/>
+                        <text x="350" y="230" text-anchor="middle" fill="#333" font-size="12">Données</text>
+                        
+                        <circle cx="650" cy="240" r="8" fill="#ffd700"/>
+                        <text x="650" y="230" text-anchor="middle" fill="#333" font-size="12">Données</text>
+                    </svg>
+                </div>
+                
+                <h3>3.2 Synchronisation Downstream (Descendante)</h3>
+                
+                <div class="definition-box">
+                    <strong>Downstream :</strong> La synchronisation downstream (ou descendante) est le processus par lequel un système local récupère (pull) des données ou des modifications depuis une source distante ou centrale. C'est un mouvement "vers le bas" dans la hiérarchie.
+                </div>
+                
+                <p><strong>Caractéristiques principales :</strong></p>
+                <ul style="margin-left: 40px;">
+                    <li>Initiative du client : le système local tire (pull) les modifications</li>
+                    <li>Récupération réactive ou périodique</li>
+                    <li>Utilisé pour obtenir les dernières mises à jour d'une source autoritaire</li>
+                    <li>Meilleur contrôle par le client sur le timing</li>
+                </ul>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Figure 4 : Synchronisation Downstream (Pull)</div>
+                    <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Central server -->
+                        <rect x="325" y="50" width="150" height="100" fill="#667eea" rx="10"/>
+                        <text x="400" y="90" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Serveur</text>
+                        <text x="400" y="115" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Central</text>
+                        
+                        <!-- Local nodes -->
+                        <circle cx="150" cy="300" r="50" fill="#00bcd4" stroke="#fff" stroke-width="3"/>
+                        <text x="150" y="295" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Nœud</text>
+                        <text x="150" y="315" text-anchor="middle" fill="white" font-size="14">Local A</text>
+                        
+                        <circle cx="350" cy="300" r="50" fill="#00bcd4" stroke="#fff" stroke-width="3"/>
+                        <text x="350" y="295" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Nœud</text>
+                        <text x="350" y="315" text-anchor="middle" fill="white" font-size="14">Local B</text>
+                        
+                        <circle cx="650" cy="300" r="50" fill="#00bcd4" stroke="#fff" stroke-width="3"/>
+                        <text x="650" y="295" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Nœud</text>
+                        <text x="650" y="315" text-anchor="middle" fill="white" font-size="14">Local C</text>
+                        
+                        <!-- Arrows -->
+                        <defs>
+                            <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#ff5722"/>
+                            </marker>
+                        </defs>
+                        
+                        <line x1="360" y1="160" x2="180" y2="260" stroke="#ff5722" stroke-width="4" marker-end="url(#arrow2)"/>
+                        <line x1="390" y1="160" x2="370" y2="250" stroke="#ff5722" stroke-width="4" marker-end="url(#arrow2)"/>
+                        <line x1="440" y1="160" x2="620" y2="260" stroke="#ff5722" stroke-width="4" marker-end="url(#arrow2)"/>
+                        
+                        <!-- Labels -->
+                        <text x="250" y="200" fill="#ff5722" font-size="14" font-weight="bold">PULL</text>
+                        <text x="380" y="200" fill="#ff5722" font-size="14" font-weight="bold">PULL</text>
+                        <text x="520" y="200" fill="#ff5722" font-size="14" font-weight="bold">PULL</text>
+                        
+                        <!-- Request indicators -->
+                        <text x="220" y="180" fill="#333" font-size="12">Requête</text>
+                        <text x="350" y="180" fill="#333" font-size="12">Requête</text>
+                        <text x="480" y="180" fill="#333" font-size="12">Requête</text>
+                    </svg>
+                </div>
+                
+                <h3>3.3 Synchronisation Bidirectionnelle</h3>
+                
+                <p>
+                    Dans de nombreux systèmes modernes, la synchronisation est bidirectionnelle, combinant les approches upstream et downstream pour assurer une cohérence complète des données.
+                </p>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Figure 5 : Synchronisation Bidirectionnelle</div>
+                    <svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Node 1 -->
+                        <rect x="100" y="125" width="150" height="100" fill="#667eea" rx="10"/>
+                        <text x="175" y="165" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Nœud A</text>
+                        <text x="175" y="190" text-anchor="middle" fill="white" font-size="13">Base de données</text>
+                        <text x="175" y="210" text-anchor="middle" fill="white" font-size="13">Locale</text>
+                        
+                        <!-- Node 2 -->
+                        <rect x="550" y="125" width="150" height="100" fill="#4caf50" rx="10"/>
+                        <text x="625" y="165" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Nœud B</text>
+                        <text x="625" y="190" text-anchor="middle" fill="white" font-size="13">Base de données</text>
+                        <text x="625" y="210" text-anchor="middle" fill="white" font-size="13">Locale</text>
+                        
+                        <!-- Arrows -->
+                        <defs>
+                            <marker id="arrow3" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#9c27b0"/>
+                            </marker>
+                            <marker id="arrow4" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#00bcd4"/>
+                            </marker>
+                        </defs>
+                        
+                        <!-- Upstream arrow -->
+                        <line x1="250" y1="155" x2="540" y2="155" stroke="#9c27b0" stroke-width="4" marker-end="url(#arrow3)"/>
+                        <text x="395" y="140" text-anchor="middle" fill="#9c27b0" font-size="14" font-weight="bold">UPSTREAM (Push)</text>
+                        
+                        <!-- Downstream arrow -->
+                        <line x1="540" y1="195" x2="250" y2="195" stroke="#00bcd4" stroke-width="4" marker-end="url(#arrow4)"/>
+                        <text x="395" y="220" text-anchor="middle" fill="#00bcd4" font-size="14" font-weight="bold">DOWNSTREAM (Pull)</text>
+                        
+                        <!-- Time indicators -->
+                        <circle cx="395" cy="80" r="40" fill="#ffd700" opacity="0.3"/>
+                        <text x="395" y="85" text-anchor="middle" fill="#333" font-size="14" font-weight="bold">Synchronisation</text>
+                        <text x="395" y="100" text-anchor="middle" fill="#333" font-size="12">Continue</text>
+                        
+                        <!-- Status -->
+                        <text x="175" y="260" text-anchor="middle" fill="#666" font-size="12">État : Synchronisé</text>
+                        <text x="625" y="260" text-anchor="middle" fill="#666" font-size="12">État : Synchronisé</text>
+                    </svg>
+                </div>
+            </section>
+            
+            <!-- Mécanismes -->
+            <section id="mecanismes" class="section">
+                <h2>4. Mécanismes de Synchronisation</h2>
+                
+                <h3>4.1 Synchronisation Basée sur le Temps</h3>
+                
+                <div class="example-box">
+                    <h4>📌 Exemple : Cron Jobs</h4>
+                    <p>
+                        Un système utilise des tâches planifiées (cron) pour synchroniser les données toutes les heures :
+                    </p>
+                    <code>0 * * * * /usr/bin/sync-script.sh</code>
+                    <p style="margin-top: 10px;">
+                        Cette approche est simple mais peut entraîner des retards dans la propagation des changements.
+                    </p>
+                </div>
+                
+                <h3>4.2 Synchronisation Basée sur les Événements</h3>
+                
+                <div class="example-box">
+                    <h4>📌 Exemple : Webhooks</h4>
+                    <p>
+                        Lorsqu'un changement se produit dans le système A, un webhook notifie immédiatement le système B pour déclencher une synchronisation. Avantage : latence minimale.
+                    </p>
+                </div>
+                
+                <h3>4.3 Réplication Maître-Esclave</h3>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Figure 6 : Réplication Maître-Esclave</div>
+                    <svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Master -->
+                        <rect x="325" y="50" width="150" height="100" fill="#e91e63" rx="10"/>
+                        <text x="400" y="90" text-anchor="middle" fill="white" font-size="16" font-weight="bold">MAÎTRE</text>
+                        <text x="400" y="115" text-anchor="middle" fill="white" font-size="14">Lecture/Écriture</text>
+                        
+                        <!-- Slaves -->
+                        <rect x="100" y="250" width="150" height="80" fill="#3f51b5" rx="10"/>
+                        <text x="175" y="285" text-anchor="middle" fill="white" font-size="14" font-weight="bold">ESCLAVE 1</text>
+                        <text x="175" y="305" text-anchor="middle" fill="white" font-size="12">Lecture seule</text>
+                        
+                        <rect x="325" y="250" width="150" height="80" fill="#3f51b5" rx="10"/>
+                        <text x="400" y="285" text-anchor="middle" fill="white" font-size="14" font-weight="bold">ESCLAVE 2</text>
+                        <text x="400" y="305" text-anchor="middle" fill="white" font-size="12">Lecture seule</text>
+                        
+                        <rect x="550" y="250" width="150" height="80" fill="#3f51b5" rx="10"/>
+                        <text x="625" y="285" text-anchor="middle" fill="white" font-size="14" font-weight="bold">ESCLAVE 3</text>
+                        <text x="625" y="305" text-anchor="middle" fill="white" font-size="12">Lecture seule</text>
+                        
+                        <!-- Replication arrows -->
+                        <defs>
+                            <marker id="arrow5" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#ff9800"/>
+                            </marker>
+                        </defs>
+                        
+                        <line x1="360" y1="150" x2="190" y2="250" stroke="#ff9800" stroke-width="3" stroke-dasharray="5,5" marker-end="url(#arrow5)"/>
+                        <line x1="400" y1="150" x2="400" y2="250" stroke="#ff9800" stroke-width="3" stroke-dasharray="5,5" marker-end="url(#arrow5)"/>
+                        <line x1="440" y1="150" x2="610" y2="250" stroke="#ff9800" stroke-width="3" stroke-dasharray="5,5" marker-end="url(#arrow5)"/>
+                        
+                        <!-- Labels -->
+                        <text x="260" y="200" fill="#ff9800" font-size="13">Réplication</text>
+                        <text x="400" y="200" fill="#ff9800" font-size="13">Réplication</text>
+                        <text x="520" y="200" fill="#ff9800" font-size="13">Réplication</text>
+                        
+                        <!-- Write operation -->
+                        <circle cx="400" cy="30" r="5" fill="#4caf50"/>
+                        <text x="450" y="35" fill="#4caf50" font-size="12">Écriture (Write)</text>
+                    </svg>
+                </div>
+                
+                <h3>4.4 Réplication Multi-Maître</h3>
+                
+                <p>
+                    Dans une architecture multi-maître, plusieurs nœuds peuvent accepter des écritures simultanément. La résolution des conflits devient alors cruciale.
+                </p>
+                
+                <div class="key-points">
+                    <strong>🔑 Points Clés de la Résolution de Conflits :</strong>
+                    <ul>
+                        <li><strong>Last Write Wins (LWW) :</strong> La dernière modification gagne (basée sur l'horodatage)</li>
+                        <li><strong>Version Vectors :</strong> Suivi des versions pour détecter les conflits</li>
+                        <li><strong>CRDT (Conflict-free Replicated Data Types) :</strong> Structures de données qui garantissent la convergence</li>
+                        <li><strong>Résolution manuelle :</strong> Intervention humaine pour les cas complexes</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- Comparaison -->
+            <section id="comparaison" class="section">
+                <h2>5. Tableau Comparatif</h2>
+                
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Critère</th>
+                            <th>Upstream (Push)</th>
+                            <th>Downstream (Pull)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Initiative</strong></td>
+                            <td>Source (système local)</td>
+                            <td>Destination (système distant)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Latence</strong></td>
+                            <td>Faible (quasi temps réel)</td>
+                            <td>Variable (dépend de la fréquence de polling)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Charge serveur</strong></td>
+                            <td>Moyenne (reçoit les push)</td>
+                            <td>Élevée (répond aux requêtes)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Charge client</strong></td>
+                            <td>Élevée (initie les envois)</td>
+                            <td>Moyenne (fait des requêtes)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Contrôle</strong></td>
+                            <td>Source contrôle le timing</td>
+                            <td>Destination contrôle le timing</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bande passante</strong></td>
+                            <td>Optimisée (envoi uniquement si changement)</td>
+                            <td>Potentiellement gaspillée (polling inutile)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complexité</strong></td>
+                            <td>Moyenne</td>
+                            <td>Simple</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cas d'usage</strong></td>
+                            <td>Git push, notifications, webhooks</td>
+                            <td>Git pull, RSS feeds, synchronisation périodique</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fiabilité</strong></td>
+                            <td>Nécessite gestion des échecs</td>
+                            <td>Retry automatique possible</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Évolutivité</strong></td>
+                            <td>Bonne avec files d'attente</td>
+                            <td>Limitée par le polling</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Attention :</strong> Le choix entre upstream et downstream dépend fortement du contexte. Considérez la fréquence des changements, les exigences de latence, et les contraintes de ressources avant de choisir.
+                </div>
+            </section>
+            
+            <!-- Exemples pratiques -->
+            <section id="exemples" class="section">
+                <h2>6. Exemples Pratiques</h2>
+                
+                <h3>6.1 Git : Un Exemple Classique</h3>
+                
+                <div class="example-box">
+                    <h4>📌 Exemple : Workflow Git</h4>
+                    <p><strong>Upstream (Push) :</strong></p>
+                    <code>git push origin main</code>
+                    <p style="margin-top: 10px;">
+                        Le développeur envoie ses modifications locales vers le dépôt distant (GitHub, GitLab, etc.).
+                    </p>
+                    
+                    <p style="margin-top: 15px;"><strong>Downstream (Pull) :</strong></p>
+                    <code>git pull origin main</code>
+                    <p style="margin-top: 10px;">
+                        Le développeur récupère les dernières modifications du dépôt distant vers son environnement local.
+                    </p>
+                </div>
+                
+                <h3>6.2 Base de Données Distribuée</h3>
+                
+                <div class="example-box">
+                    <h4>📌 Exemple : Cassandra (Multi-Maître)</h4>
+                    <p>
+                        Apache Cassandra utilise une approche de réplication multi-maître où chaque nœud peut accepter des écritures. La synchronisation se fait de manière bidirectionnelle :
+                    </p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Upstream :</strong> Un nœud propage ses écritures vers les autres répliques</li>
+                        <li><strong>Downstream :</strong> Les nœuds demandent les données manquantes via des mécanismes de réparation</li>
+                        <li><strong>Résolution de conflits :</strong> Utilisation de timestamps (LWW)</li>
+                    </ul>
+                </div>
+                
+                <h3>6.3 Synchronisation Mobile</h3>
+                
+                <div class="example-box">
+                    <h4>📌 Exemple : Application Mobile avec Cloud</h4>
+                    <p><strong>Scénario :</strong> Une application de notes (comme Evernote ou Notion)</p>
+                    
+                    <p style="margin-top: 10px;"><strong>Upstream :</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>L'utilisateur crée une note sur son smartphone</li>
+                        <li>L'application pousse immédiatement la note vers le cloud</li>
+                        <li>Mécanisme : WebSocket ou API REST POST</li>
+                    </ul>
+                    
+                    <p style="margin-top: 10px;"><strong>Downstream :</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>L'application vérifie régulièrement les nouvelles notes du cloud</li>
+                        <li>Polling périodique ou notifications push</li>
+                        <li>Synchronisation complète au démarrage de l'application</li>
+                    </ul>
+                </div>
+                
+                <h3>6.4 E-commerce : Gestion des Stocks</h3>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Figure 7 : Synchronisation des Stocks E-commerce</div>
+                    <svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Central inventory -->
+                        <rect x="300" y="30" width="200" height="80" fill="#667eea" rx="10"/>
+                        <text x="400" y="65" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Système Central</text>
+                        <text x="400" y="90" text-anchor="middle" fill="white" font-size="13">Inventaire Maître</text>
+                        
+                        <!-- Store 1 -->
+                        <rect x="80" y="200" width="160" height="70" fill="#4caf50" rx="10"/>
+                        <text x="160" y="230" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Magasin A</text>
+                        <text x="160" y="250" text-anchor="middle" fill="white" font-size="12">Stock: 50 unités</text>
+                        
+                        <!-- Store 2 -->
+                        <rect x="320" y="200" width="160" height="70" fill="#4caf50" rx="10"/>
+                        <text x="400" y="230" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Magasin B</text>
+                        <text x="400" y="250" text-anchor="middle" fill="white" font-size="12">Stock: 35 unités</text>
+                        
+                        <!-- Online -->
+                        <rect x="560" y="200" width="160" height="70" fill="#ff9800" rx="10"/>
+                        <text x="640" y="230" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Site Web</text>
+                        <text x="640" y="250" text-anchor="middle" fill="white" font-size="12">Ventes en ligne</text>
+                        
+                        <!-- Arrows upstream -->
+                        <defs>
+                            <marker id="arrow6" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#9c27b0"/>
+                            </marker>
+                            <marker id="arrow7" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#00bcd4"/>
+                            </marker>
+                        </defs>
+                        
+                        <!-- Upstream arrows -->
+                        <line x1="180" y1="200" x2="340" y2="120" stroke="#9c27b0" stroke-width="3" marker-end="url(#arrow6)"/>
+                        <line x1="400" y1="200" x2="400" y2="120" stroke="#9c27b0" stroke-width="3" marker-end="url(#arrow6)"/>
+                        <line x1="620" y1="200" x2="460" y2="120" stroke="#9c27b0" stroke-width="3" marker-end="url(#arrow6)"/>
+                        
+                        <text x="240" y="155" fill="#9c27b0" font-size="12" font-weight="bold">Vente (-1)</text>
+                        <text x="380" y="155" fill="#9c27b0" font-size="12" font-weight="bold">Vente (-1)</text>
+                        <text x="520" y="155" fill="#9c27b0" font-size="12" font-weight="bold">Vente (-1)</text>
+                        
+                        <!-- Downstream arrows -->
+                        <line x1="340" y1="120" x2="180" y2="190" stroke="#00bcd4" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow7)"/>
+                        <line x1="400" y1="120" x2="400" y2="190" stroke="#00bcd4" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow7)"/>
+                        <line x1="460" y1="120" x2="620" y2="190" stroke="#00bcd4" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow7)"/>
+                        
+                        <text x="240" y="180" fill="#00bcd4" font-size="11">MAJ Stock</text>
+                        <text x="380" y="180" fill="#00bcd4" font-size="11">MAJ Stock</text>
+                        <text x="520" y="180" fill="#00bcd4" font-size="11">MAJ Stock</text>
+                        
+                        <!-- Events -->
+                        <rect x="50" y="320" width="700" height="100" fill="#f5f5f5" rx="10" stroke="#ddd" stroke-width="2"/>
+                        <text x="400" y="345" text-anchor="middle" fill="#333" font-size="14" font-weight="bold">Flux de Synchronisation</text>
+                        
+                        <text x="70" y="370" fill="#333" font-size="12">1. Client achète produit (Magasin A)</text>
+                        <text x="70" y="390" fill="#333" font-size="12">2. Magasin A → PUSH mise à jour stock vers Central</text>
+                        <text x="70" y="410" fill="#333" font-size="12">3. Central → PUSH notification vers tous les points de vente</text>
+                    </svg>
+                </div>
+                
+                <div class="example-box">
+                    <h4>📌 Détails du Scénario</h4>
+                    <p><strong>Synchronisation Upstream :</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Chaque point de vente envoie les transactions en temps réel</li>
+                        <li>Le système central met à jour l'inventaire global</li>
+                        <li>Prévient les surventes grâce à la mise à jour immédiate</li>
+                    </ul>
+                    
+                    <p style="margin-top: 10px;"><strong>Synchronisation Downstream :</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Les points de vente reçoivent les mises à jour du stock global</li>
+                        <li>Permettent d'afficher la disponibilité en temps réel</li>
+                        <li>Synchronisation périodique pour les correctifs d'inventaire</li>
+                    </ul>
+                </div>
+                
+                <h3>6.5 IoT : Capteurs et Cloud</h3>
+                
+                <div class="example-box">
+                    <h4>📌 Exemple : Réseau de Capteurs Météo</h4>
+                    <p><strong>Upstream :</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Capteurs de température envoyent des mesures toutes les 5 minutes</li>
+                        <li>Protocole : MQTT avec QoS 1 (au moins une livraison)</li>
+                        <li>Données agrégées dans une base de données time-series</li>
+                    </ul>
+                    
+                    <p style="margin-top: 10px;"><strong>Downstream :</strong></p>
+                    <ul style="margin-left: 20px;">
+                        <li>Capteurs récupèrent les configurations mises à jour</li>
+                        <li>Mise à jour du firmware à distance</li>
+                        <li>Réception de seuils d'alerte ajustés</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- Cas d'étude TD -->
+            <section id="cas-etude" class="section">
+                <h2>7. Cas d'Étude : Plateforme de Réservation Hôtelière Distribuée</h2>
+                
+                <div class="definition-box">
+                    <strong>📖 Contexte du Cas d'Étude :</strong>
+                    <p style="margin-top: 10px;">
+                        La société <strong>HotelBooking</strong> exploite une plateforme de réservation en ligne présente dans 5 régions du monde (Europe, Amérique du Nord, Amérique du Sud, Asie, Afrique). Chaque région dispose d'un centre de données autonome avec sa propre base de données. Les clients peuvent réserver des chambres d'hôtel partout dans le monde depuis n'importe quelle région.
+                    </p>
+                    <p style="margin-top: 10px;">
+                        <strong>Architecture actuelle :</strong>
+                    </p>
+                    <ul style="margin-left: 20px;">
+                        <li>5 centres de données régionaux (DC-EU, DC-NA, DC-SA, DC-AS, DC-AF)</li>
+                        <li>Chaque DC gère ~2000 hôtels dans sa région</li>
+                        <li>Base de données PostgreSQL par région</li>
+                        <li>~100 000 réservations par jour au total</li>
+                        <li>Temps de latence inter-régions : 150-300ms</li>
+                    </ul>
+                </div>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Figure 8 : Architecture Système HotelBooking</div>
+                    <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Central -->
+                        <circle cx="400" cy="250" r="60" fill="#667eea" opacity="0.2"/>
+                        <text x="400" y="255" text-anchor="middle" fill="#667eea" font-size="14" font-weight="bold">Internet</text>
+                        
+                        <!-- DC Europe -->
+                        <rect x="350" y="50" width="100" height="70" fill="#4caf50" rx="8"/>
+                        <text x="400" y="75" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DC-EU</text>
+                        <text x="400" y="95" text-anchor="middle" fill="white" font-size="11">Europe</text>
+                        <text x="400" y="110" text-anchor="middle" fill="white" font-size="10">2000 hôtels</text>
+                        
+                        <!-- DC North America -->
+                        <rect x="150" y="150" width="100" height="70" fill="#4caf50" rx="8"/>
+                        <text x="200" y="175" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DC-NA</text>
+                        <text x="200" y="195" text-anchor="middle" fill="white" font-size="11">N. America</text>
+                        <text x="200" y="210" text-anchor="middle" fill="white" font-size="10">2000 hôtels</text>
+                        
+                        <!-- DC Asia -->
+                        <rect x="550" y="150" width="100" height="70" fill="#4caf50" rx="8"/>
+                        <text x="600" y="175" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DC-AS</text>
+                        <text x="600" y="195" text-anchor="middle" fill="white" font-size="11">Asie</text>
+                        <text x="600" y="210" text-anchor="middle" fill="white" font-size="10">2000 hôtels</text>
+                        
+                        <!-- DC South America -->
+                        <rect x="220" y="350" width="100" height="70" fill="#4caf50" rx="8"/>
+                        <text x="270" y="375" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DC-SA</text>
+                        <text x="270" y="395" text-anchor="middle" fill="white" font-size="11">S. America</text>
+                        <text x="270" y="410" text-anchor="middle" fill="white" font-size="10">2000 hôtels</text>
+                        
+                        <!-- DC Africa -->
+                        <rect x="480" y="350" width="100" height="70" fill="#4caf50" rx="8"/>
+                        <text x="530" y="375" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DC-AF</text>
+                        <text x="530" y="395" text-anchor="middle" fill="white" font-size="11">Afrique</text>
+                        <text x="530" y="410" text-anchor="middle" fill="white" font-size="10">2000 hôtels</text>
+                        
+                        <!-- Connections -->
+                        <line x1="390" y1="120" x2="250" y2="160" stroke="#999" stroke-width="2" stroke-dasharray="3,3"/>
+                        <line x1="410" y1="120" x2="550" y2="160" stroke="#999" stroke-width="2" stroke-dasharray="3,3"/>
+                        <line x1="250" y1="200" x2="280" y2="350" stroke="#999" stroke-width="2" stroke-dasharray="3,3"/>
+                        <line x1="550" y1="200" x2="520" y2="350" stroke="#999" stroke-width="2" stroke-dasharray="3,3"/>
+                        <line x1="320" y1="370" x2="480" y2="370" stroke="#999" stroke-width="2" stroke-dasharray="3,3"/>
+                        
+                        <!-- Users -->
+                        <circle cx="100" cy="250" r="25" fill="#ff9800"/>
+                        <text x="100" y="255" text-anchor="middle" fill="white" font-size="12">👤</text>
+                        <text x="100" y="290" text-anchor="middle" fill="#333" font-size="11">Client</text>
+                        
+                        <circle cx="700" cy="250" r="25" fill="#ff9800"/>
+                        <text x="700" y="255" text-anchor="middle" fill="white" font-size="12">👤</text>
+                        <text x="700" y="290" text-anchor="middle" fill="#333" font-size="11">Client</text>
+                    </svg>
+                </div>
+                
+                <h3>7.1 Problématiques Identifiées</h3>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Problèmes Actuels :</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Survente :</strong> Des chambres sont parfois réservées deux fois simultanément depuis différentes régions</li>
+                        <li><strong>Incohérence des prix :</strong> Les prix promotionnels ne se propagent pas assez rapidement</li>
+                        <li><strong>Disponibilité incorrecte :</strong> Un client voit des chambres disponibles qui sont déjà réservées</li>
+                        <li><strong>Latence élevée :</strong> Les recherches inter-régionales sont lentes</li>
+                    </ul>
+                </div>
+                
+                <h3>7.2 Questions du TD</h3>
+                
+                <div class="example-box">
+                    <h4>❓ Question 1 : Analyse de l'Architecture Actuelle</h4>
+                    <p><strong>Énoncé :</strong></p>
+                    <p>
+                        Identifiez le type de synchronisation actuellement utilisé par HotelBooking. S'agit-il d'une approche upstream, downstream, ou les deux ? Justifiez votre réponse en analysant les flux de données.
+                    </p>
+                    
+                    <div style="background: #fff; padding: 15px; margin-top: 15px; border-left: 4px solid #4caf50; border-radius: 5px;">
+                        <p><strong>✅ Réponse :</strong></p>
+                        <p style="margin-top: 10px;">
+                            L'architecture actuelle semble utiliser une <strong>synchronisation hybride faible ou inexistante</strong>, ce qui explique les problèmes rencontrés :
+                        </p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li><strong>Absence de synchronisation upstream efficace :</strong> Lorsqu'une réservation est effectuée dans DC-EU, cette information n'est pas immédiatement poussée (push) vers les autres centres de données. Cela explique les surventes.</li>
+                            <li><strong>Synchronisation downstream insuffisante :</strong> Les centres de données ne récupèrent pas régulièrement (pull) les mises à jour des autres régions, ou le font avec une fréquence trop faible.</li>
+                            <li><strong>Architecture en silos :</strong> Chaque DC fonctionne de manière autonome, ce qui crée des îlots de données non synchronisés.</li>
+                        </ul>
+                        <p style="margin-top: 10px;">
+                            <strong>Conséquence :</strong> Le système présente une <em>cohérence éventuelle très lente</em>, voire aucune cohérence garantie entre les régions.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <h4>❓ Question 2 : Proposition de Solution Upstream</h4>
+                    <p><strong>Énoncé :</strong></p>
+                    <p>
+                        Proposez une solution basée sur la synchronisation upstream pour résoudre le problème de survente. Décrivez le flux de données, le protocole à utiliser, et les composants nécessaires.
+                    </p>
+                    
+                    <div style="background: #fff; padding: 15px; margin-top: 15px; border-left: 4px solid #4caf50; border-radius: 5px;">
+                        <p><strong>✅ Réponse :</strong></p>
+                        <p style="margin-top: 10px;">
+                            <strong>Solution : Système de Notification en Temps Réel avec Message Queue</strong>
+                        </p>
+                        
+                        <p style="margin-top: 10px;"><strong>Architecture proposée :</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Message Broker Central :</strong> Apache Kafka ou RabbitMQ déployé dans chaque région avec réplication inter-régionale</li>
+                            <li><strong>Topics dédiés :</strong> 
+                                <ul style="margin-left: 20px;">
+                                    <li><code>reservations.created</code></li>
+                                    <li><code>reservations.cancelled</code></li>
+                                    <li><code>availability.updated</code></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        
+                        <p style="margin-top: 10px;"><strong>Flux de données (Upstream) :</strong></p>
+                        <ol style="margin-left: 20px;">
+                            <li>Client effectue une réservation dans DC-EU (Hôtel ID=1234, Chambre=101)</li>
+                            <li>DC-EU écrit la transaction dans sa BD locale (cohérence locale immédiate)</li>
+                            <li>DC-EU <strong>PUSH</strong> un message vers Kafka : 
+                                <code style="display:block; margin: 5px 0;">
+                                    {<br/>
+                                    &nbsp;&nbsp;"event": "reservation.created",<br/>
+                                    &nbsp;&nbsp;"hotel_id": 1234,<br/>
+                                    &nbsp;&nbsp;"room_id": 101,<br/>
+                                    &nbsp;&nbsp;"timestamp": "2025-10-28T14:30:00Z",<br/>
+                                    &nbsp;&nbsp;"source_dc": "EU"<br/>
+                                    }
+                                </code>
+                            </li>
+                            <li>Kafka réplique ce message vers tous les centres de données (latence ~300ms)</li>
+                            <li>Chaque DC consomme le message et met à jour sa BD locale</li>
+                            <li>Disponibilité synchronisée en <strong>moins de 500ms</strong></li>
+                        </ol>
+                        
+                        <p style="margin-top: 10px;"><strong>Avantages :</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>Propagation rapide des changements (quasi temps réel)</li>
+                            <li>Découplage entre les systèmes</li>
+                            <li>Garantie de livraison avec Kafka (persistance)</li>
+                            <li>Évolutivité horizontale</li>
+                        </ul>
+                        
+                        <p style="margin-top: 10px;"><strong>Gestion des conflits :</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>Utilisation de <strong>timestamps vectoriels</strong> pour détecter les réservations concurrentes</li>
+                            <li>Règle : "First Write Wins" - la première réservation horodatée l'emporte</li>
+                            <li>Compensation automatique si conflit détecté (remboursement + notification)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="diagram">
+                    <div class="diagram-title">Figure 9 : Solution Upstream avec Kafka</div>
+                    <svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+                        <!-- DC-EU makes reservation -->
+                        <rect x="50" y="50" width="120" height="80" fill="#4caf50" rx="8"/>
+                        <text x="110" y="85" text-anchor="middle" fill="white" font-size="14" font-weight="bold">DC-EU</text>
+                        <text x="110" y="105" text-anchor="middle" fill="white" font-size="11">Réservation</text>
+                        <text x="110" y="120" text-anchor="middle" fill="white" font-size="10">créée ici</text>
+                        
+                        <!-- Kafka Central -->
+                        <rect x="310" y="150" width="180" height="100" fill="#ff9800" rx="8"/>
+                        <text x="400" y="185" text-anchor="middle" fill="white" font-size="16" font-weight="bold">Apache Kafka</text>
+                        <text x="400" y="210" text-anchor="middle" fill="white" font-size="12">Message Broker</text>
+                        <text x="400" y="230" text-anchor="middle" fill="white" font-size="11">Topic: reservations</text>
+                        
+                        <!-- Other DCs -->
+                        <rect x="630" y="50" width="120" height="60" fill="#3f51b5" rx="8"/>
+                        <text x="690" y="75" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DC-NA</text>
+                        <text x="690" y="95" text-anchor="middle" fill="white" font-size="10">Consommateur</text>
+                        
+                        <rect x="630" y="140" width="120" height="60" fill="#3f51b5" rx="8"/>
+                        <text x="690" y="165" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DC-AS</text>
+                        <text x="690" y="185" text-anchor="middle" fill="white" font-size="10">Consommateur</text>
+                        
+                        <rect x="630" y="230" width="120" height="60" fill="#3f51b5" rx="8"/>
+                        <text x="690" y="255" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DC-SA</text>
+                        <text x="690" y="275" text-anchor="middle" fill="white" font-size="10">Consommateur</text>
+                        
+                        <rect x="630" y="320" width="120" height="60" fill="#3f51b5" rx="8"/>
+                        <text x="690" y="345" text-anchor="middle" fill="white" font-size="13" font-weight="bold">DC-AF</text>
+                        <text x="690" y="365" text-anchor="middle" fill="white" font-size="10">Consommateur</text>
+                        
+                        <!-- Arrows -->
+                        <defs>
+                            <marker id="arrow8" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#e91e63"/>
+                            </marker>
+                        </defs>
+                        
+                        <!-- Push to Kafka -->
+                        <line x1="170" y1="90" x2="310" y2="180" stroke="#e91e63" stroke-width="4" marker-end="url(#arrow8)"/>
+                        <text x="230" y="130" fill="#e91e63" font-size="13" font-weight="bold">1. PUSH</text>
+                        
+                        <!-- Kafka to consumers -->
+                        <line x1="490" y1="180" x2="630" y2="80" stroke="#e91e63" stroke-width="3" marker-end="url(#arrow8)"/>
+                        <line x1="490" y1="195" x2="630" y2="170" stroke="#e91e63" stroke-width="3" marker-end="url(#arrow8)"/>
+                        <line x1="490" y1="210" x2="630" y2="260" stroke="#e91e63" stroke-width="3" marker-end="url(#arrow8)"/>
+                        <line x1="490" y1="225" x2="630" y2="350" stroke="#e91e63" stroke-width="3" marker-end="url(#arrow8)"/>
+                        
+                        <text x="550" y="125" fill="#e91e63" font-size="11">2. Broadcast</text>
+                        
+                        <!-- Timeline -->
+                        <text x="400" y="380" text-anchor="middle" fill="#666" font-size="13" font-weight="bold">Temps de propagation : &lt; 500ms</text>
+                        <line x1="100" y1="400" x2="700" y2="400" stroke="#666" stroke-width="2"/>
+                        <circle cx="100" cy="400" r="5" fill="#4caf50"/>
+                        <text x="100" y="425" text-anchor="middle" fill="#333" font-size="11">t=0</text>
+                        <circle cx="700" cy="400" r="5" fill="#3f51b5"/>
+                        <text x="700" y="425" text-anchor="middle" fill="#333" font-size="11">t=500ms</text>
+                    </svg>
+                </div>
+                
+                <div class="example-box">
+                    <h4>❓ Question 3 : Stratégie Downstream Complémentaire</h4>
+                    <p><strong>Énoncé :</strong></p>
+                    <p>
+                        La solution upstream ne suffit pas toujours (pannes réseau, perte de messages). Proposez une stratégie downstream complémentaire pour garantir la cohérence à long terme. Quelle fréquence de synchronisation recommandez-vous ?
+                    </p>
+                    
+                    <div style="background: #fff; padding: 15px; margin-top: 15px; border-left: 4px solid #4caf50; border-radius: 5px;">
+                        <p><strong>✅ Réponse :</strong></p>
+                        <p style="margin-top: 10px;">
+                            <strong>Solution : Synchronisation Downstream Multi-niveaux</strong>
+                        </p>
+                        
+                        <p style="margin-top: 10px;"><strong>1. Synchronisation Incrémentale (Pull court terme)</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Fréquence :</strong> Toutes les 5 minutes</li>
+                            <li><strong>Mécanisme :</strong> Chaque DC interroge les autres DCs pour récupérer les changements depuis le dernier timestamp connu</li>
+                            <li><strong>Requête SQL :</strong> 
+                                <code style="display:block; margin: 5px 0;">
+                                    SELECT * FROM reservations<br/>
+                                    WHERE updated_at &gt; '2025-10-28 14:25:00'<br/>
+                                    AND source_dc != 'EU'
+                                </code>
+                            </li>
+                            <li><strong>Objectif :</strong> Rattraper les messages Kafka manqués</li>
+                        </ul>
+                        
+                        <p style="margin-top: 10px;"><strong>2. Synchronisation Complète (Pull long terme)</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Fréquence :</strong> Une fois par jour (heures creuses, ex: 3h du matin heure locale)</li>
+                            <li><strong>Mécanisme :</strong> Comparaison complète des checksums par table</li>
+                            <li><strong>Processus :</strong>
+                                <ol style="margin-left: 20px;">
+                                    <li>Calcul du checksum de chaque table (MD5 des IDs triés)</li>
+                                    <li>Comparaison entre DCs</li>
+                                    <li>Si différence détectée → synchronisation complète de la table</li>
+                                    <li>Rapport de réconciliation envoyé aux administrateurs</li>
+                                </ol>
+                            </li>
+                            <li><strong>Objectif :</strong> Garantir la cohérence forte à long terme</li>
+                        </ul>
+                        
+                        <p style="margin-top: 10px;"><strong>3. Synchronisation à la Demande (Pull réactif)</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Déclencheur :</strong> Lorsqu'un utilisateur consulte un hôtel</li>
+                            <li><strong>Mécanisme :</strong> Requête temps réel vers le DC source pour vérifier la disponibilité</li>
+                            <li><strong>Cache :</strong> Résultat mis en cache pour 30 secondes</li>
+                            <li><strong>Objectif :</strong> Garantir la fraîcheur des données affichées à l'utilisateur</li>
+                        </ul>
+                        
+                        <p style="margin-top: 10px;"><strong>Recommandation de Fréquences :</strong></p>
+                        <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                            <tr style="background: #f5f5f5;">
+                                <th style="padding: 8px; border: 1px solid #ddd;">Type</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Fréquence</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Latence Acceptable</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Incrémentale</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">5 minutes</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">5-10 min</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Complète</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">24 heures</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">24h</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;">À la demande</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Temps réel</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&lt; 1s</td>
+                            </tr>
+                        </table>
+                        
+                        <p style="margin-top: 10px;"><strong>Avantages de cette approche multi-niveaux :</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>Résilience face aux pannes réseau temporaires</li>
+                            <li>Détection et correction automatique des dérives</li>
+                            <li>Équilibre entre latence et charge système</li>
+                            <li>Cohérence éventuelle garantie (dans les 5 min max)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <h4>❓ Question 4 : Gestion des Conflits</h4>
+                    <p><strong>Énoncé :</strong></p>
+                    <p>
+                        Deux clients (un en Europe, un en Asie) réservent simultanément la même chambre à exactement 14:30:00 UTC. Les deux transactions sont validées localement avant que la synchronisation upstream ne se propage. Comment résoudre ce conflit ? Proposez au moins deux stratégies différentes avec leurs avantages et inconvénients.
+                    </p>
+                    
+                    <div style="background: #fff; padding: 15px; margin-top: 15px; border-left: 4px solid #4caf50; border-radius: 5px;">
+                        <p><strong>✅ Réponse :</strong></p>
+                        
+                        <p style="margin-top: 10px;"><strong>Stratégie 1 : Last Write Wins avec Timestamp Étendu</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Principe :</strong> La réservation avec le timestamp le plus précis (incluant microsecondes + ID de DC) gagne</li>
+                            <li><strong>Format timestamp :</strong> <code>2025-10-28T14:30:00.123456-EU-TXN-789</code></li>
+                            <li><strong>Règle de résolution :</strong>
+                                <ol style="margin-left: 20px;">
+                                    <li>Comparer les microsecondes</li>
+                                    <li>Si égales, comparer l'ID du DC (ordre alphabétique)</li>
+                                    <li>Si égales, comparer l'ID de transaction</li>
+                                </ol>
+                            </li>
+                            <li><strong>Action :</strong> La réservation perdante est automatiquement annulée</li>
+                            <li><strong>Compensation :</strong> 
+                                <ul style="margin-left: 20px;">
+                                    <li>Email d'excuse au client perdant</li>
+                                    <li>Proposition de chambres similaires</li>
+                                    <li>Bon de réduction de 10% sur la prochaine réservation</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>✅ Avantages :</strong> Simple, déterministe, automatique</p>
+                        <p><strong>❌ Inconvénients :</strong> Mauvaise expérience utilisateur pour le client perdant, arbitraire</p>
+                        
+                        <p style="margin-top: 15px;"><strong>Stratégie 2 : Réservation Provisoire avec Confirmation</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Principe :</strong> Introduire un état intermédiaire "PENDING_CONFIRMATION"</li>
+                            <li><strong>Flux :</strong>
+                                <ol style="margin-left: 20px;">
+                                    <li>Client effectue réservation → État = PENDING (verrou léger)</li>
+                                    <li>Système vérifie dans les 2 secondes si conflit existe</li>
+                                    <li>Si pas de conflit → État = CONFIRMED</li>
+                                    <li>Si conflit détecté → Les deux passent en état = CONFLICT</li>
+                                    <li>Système applique règle de priorité :
+                                        <ul style="margin-left: 20px;">
+                                            <li>Client avec programme de fidélité supérieur gagne</li>
+                                            <li>Ou client qui a le plus de réservations historiques</li>
+                                            <li>Ou aléatoire si égalité</li>
+                                        </ul>
+                                    </li>
+                                </ol>
+                            </li>
+                            <li><strong>Notification :</strong> Le client perdant reçoit notification dans les 3 secondes</li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>✅ Avantages :</strong> Plus juste (basé sur la fidélité), fenêtre de détection courte</p>
+                        <p><strong>❌ Inconvénients :</strong> Complexité accrue, latence de 2 secondes pour confirmation</p>
+                        
+                        <p style="margin-top: 15px;"><strong>Stratégie 3 : Surréservation Contrôlée (Overbooking)</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Principe :</strong> Accepter les deux réservations et gérer le surplus</li>
+                            <li><strong>Condition :</strong> Activé uniquement si l'hôtel a des chambres de catégorie supérieure disponibles</li>
+                            <li><strong>Action :</strong>
+                                <ol style="margin-left: 20px;">
+                                    <li>Les deux réservations sont confirmées</li>
+                                    <li>Système alloue automatiquement une chambre supérieure à l'un des clients (upgrade gratuit)</li>
+                                    <li>Notification positive : "Félicitations, vous avez été upgradé!"</li>
+                                </ol>
+                            </li>
+                            <li><strong>Coût :</strong> Perte de revenus sur la chambre supérieure</li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>✅ Avantages :</strong> Excellente expérience client, pas d'annulation</p>
+                        <p><strong>❌ Inconvénients :</strong> Coût financier, nécessite disponibilité de chambres supérieures</p>
+                        
+                        <p style="margin-top: 15px;"><strong>Recommandation :</strong></p>
+                        <p style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                            Utiliser une <strong>combinaison des stratégies 2 et 3</strong> :
+                        </p>
+                        <ul style="margin-left: 20px;">
+                            <li>Par défaut : Stratégie 2 (Réservation provisoire)</li>
+                            <li>Si conflit + upgrade disponible : Stratégie 3 (Overbooking)</li>
+                            <li>Sinon : Stratégie 1 comme fallback (LWW)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="example-box">
+                    <h4>❓ Question 5 : Métriques et Monitoring</h4>
+                    <p><strong>Énoncé :</strong></p>
+                    <p>
+                        Quelles métriques devez-vous mettre en place pour monitorer l'efficacité de votre système de synchronisation ? Définissez des seuils d'alerte appropriés.
+                    </p>
+                    
+                    <div style="background: #fff; padding: 15px; margin-top: 15px; border-left: 4px solid #4caf50; border-radius: 5px;">
+                        <p><strong>✅ Réponse :</strong></p>
+                        
+                        <p style="margin-top: 10px;"><strong>Métriques Clés :</strong></p>
+                        
+                        <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+                            <tr style="background: #667eea; color: white;">
+                                <th style="padding: 10px; border: 1px solid #ddd;">Métrique</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">Description</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">Seuil Normal</th>
+                                <th style="padding: 10px; border: 1px solid #ddd;">Seuil Alerte</th>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Sync Lag</strong></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Temps entre création et réplication</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&lt; 500ms</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&gt; 2s</td>
+                            </tr>
+                            <tr style="background: #f9f9f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Conflict Rate</strong></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Nombre de conflits / heure</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&lt; 10</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&gt; 50</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Message Loss</strong></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Messages Kafka perdus</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">0</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&gt; 0</td>
+                            </tr>
+                            <tr style="background: #f9f9f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Data Drift</strong></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Écart entre DCs (checksum)</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">0%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&gt; 0.1%</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Sync Success Rate</strong></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">% de syncs réussies</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&gt; 99.9%</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&lt; 99%</td>
+                            </tr>
+                            <tr style="background: #f9f9f9;">
+                                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Replication Delay</strong></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Retard max entre DCs</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&lt; 1s</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&gt; 5s</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #ddd;"><strong>Overbooking Rate</strong></td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">Surventes / jour</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">0</td>
+                                <td style="padding: 8px; border: 1px solid #ddd;">&gt; 5</td>
+                            </tr>
+                        </table>
+                        
+                        <p style="margin-top: 15px;"><strong>Dashboard de Monitoring Recommandé :</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li><strong>Grafana</strong> avec datasources Prometheus</li>
+                            <li><strong>Panels :</strong>
+                                <ul style="margin-left: 20px;">
+                                    <li>Graphe temps réel du Sync Lag par DC</li>
+                                    <li>Heatmap des conflits par heure/région</li>
+                                    <li>Compteur de messages Kafka (produits vs consommés)</li>
+                                    <li>Alerte visuelle si Data Drift détecté</li>
+                                </ul>
+                            </li>
+                            <li><strong>Alerting :</strong> PagerDuty ou Opsgenie pour notification équipe DevOps</li>
+                        </ul>
+                        
+                        <p style="margin-top: 15px;"><strong>Tests de Charge Recommandés :</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>Simuler 1000 réservations simultanées depuis 5 régions</li>
+                            <li>Mesurer le Sync Lag sous charge</li>
+                            <li>Objectif : &lt; 1s même à 10x la charge normale</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="key-points">
+                    <strong>🎓 Synthèse du Cas d'Étude :</strong>
+                    <ul>
+                        <li><strong>Problème :</strong> Système en silos avec synchronisation insuffisante</li>
+                        <li><strong>Solution Upstream :</strong> Message queue (Kafka) pour propagation rapide</li>
+                        <li><strong>Solution Downstream :</strong> Multi-niveaux (incrémentale + complète + à la demande)</li>
+                        <li><strong>Gestion des conflits :</strong> Combinaison de stratégies adaptatives</li>
+                        <li><strong>Monitoring :</strong> Métriques précises avec seuils d'alerte</li>
+                        <li><strong>Résultat attendu :</strong> Cohérence éventuelle &lt; 500ms, taux de survente &lt; 0.01%</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- Conclusion -->
+            <section id="conclusion" class="section">
+                <h2>8. Conclusion</h2>
+                
+                <p>
+                    La synchronisation dans les systèmes distribués est un domaine complexe mais essentiel pour garantir la cohérence et la disponibilité des données. Les approches upstream et downstream représentent deux paradigmes fondamentaux qui peuvent être combinés pour créer des systèmes robustes et efficaces.
+                </p>
+                
+                <div class="key-points">
+                    <strong>🎯 Points Essentiels à Retenir :</strong>
+                    <ul>
+                        <li><strong>Upstream (Push)</strong> : Idéal pour les mises à jour en temps réel et la propagation rapide des changements</li>
+                        <li><strong>Downstream (Pull)</strong> : Offre plus de contrôle au client et est plus simple à implémenter</li>
+                        <li><strong>Synchronisation bidirectionnelle</strong> : Souvent nécessaire dans les systèmes modernes pour une cohérence complète</li>
+                        <li><strong>Résolution de conflits</strong> : Crucial dans les architectures multi-maître</li>
+                        <li><strong>Trade-offs</strong> : Chaque approche a ses avantages et inconvénients selon le contexte</li>
+                    </ul>
+                </div>
+                
+                <div class="definition-box">
+                    <strong>Recommandations pour la Conception :</strong>
+                    <p style="margin-top: 10px;">
+                        Lors de la conception d'un système distribué, considérez les facteurs suivants :
+                    </p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>La fréquence des changements de données</li>
+                        <li>Les exigences de latence et de cohérence</li>
+                        <li>Les contraintes de bande passante et de ressources</li>
+                        <li>La tolérance aux pannes et la reprise après incident</li>
+                        <li>La complexité opérationnelle acceptable</li>
+                    </ul>
+                </div>
+                
+                <p style="margin-top: 20px;">
+                    La maîtrise de ces concepts de synchronisation permet de concevoir des systèmes distribués performants, fiables et évolutifs, capables de répondre aux exigences des applications modernes.
+                </p>
+            </section>
+        </div>
+        
+        <footer>
+            <p>&copy; 2025 - Cours sur la Synchronisation dans les Systèmes Distribués</p>
+            <p>Matériel éducatif pour l'apprentissage des systèmes distribués</p>
+        </footer>
+    </div>
+</body>
+</html>

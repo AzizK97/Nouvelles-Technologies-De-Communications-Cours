@@ -1,0 +1,1312 @@
+  }
+});
+                </div>
+
+                <h3>4.2 RabbitMQ</h3>
+
+                <p>Message broker traditionnel avec protocole AMQP, très flexible.</p>
+
+                <h4>Concepts RabbitMQ :</h4>
+                <ul>
+                    <li><strong>Exchange :</strong> Reçoit les messages et les route vers les queues</li>
+                    <li><strong>Queue :</strong> Stocke les messages pour les consommateurs</li>
+                    <li><strong>Binding :</strong> Règle de routage entre exchange et queue</li>
+                    <li><strong>Routing Key :</strong> Critère de routage des messages</li>
+                </ul>
+
+                <div class="code-block">
+<span class="comment">// Exemple RabbitMQ (Node.js avec amqplib)</span>
+<span class="keyword">const</span> amqp = <span class="function">require</span>(<span class="string">'amqplib'</span>);
+
+<span class="comment">// Publisher</span>
+<span class="keyword">const</span> connection = <span class="keyword">await</span> amqp.<span class="function">connect</span>(<span class="string">'amqp://localhost'</span>);
+<span class="keyword">const</span> channel = <span class="keyword">await</span> connection.<span class="function">createChannel</span>();
+
+<span class="keyword">const</span> exchange = <span class="string">'events'</span>;
+<span class="keyword">await</span> channel.<span class="function">assertExchange</span>(exchange, <span class="string">'topic'</span>, { durable: <span class="keyword">true</span> });
+
+<span class="keyword">const</span> event = {
+  eventType: <span class="string">'OrderPlaced'</span>,
+  orderId: <span class="string">'order-123'</span>,
+  timestamp: <span class="keyword">new</span> Date()
+};
+
+channel.<span class="function">publish</span>(
+  exchange,
+  <span class="string">'order.placed'</span>, <span class="comment">// routing key</span>
+  Buffer.<span class="function">from</span>(JSON.<span class="function">stringify</span>(event))
+);
+
+<span class="comment">// Consumer</span>
+<span class="keyword">const</span> queue = <span class="string">'inventory_queue'</span>;
+<span class="keyword">await</span> channel.<span class="function">assertQueue</span>(queue);
+<span class="keyword">await</span> channel.<span class="function">bindQueue</span>(queue, exchange, <span class="string">'order.*'</span>);
+
+channel.<span class="function">consume</span>(queue, (msg) => {
+  <span class="keyword">const</span> event = JSON.<span class="function">parse</span>(msg.content.<span class="function">toString</span>());
+  console.<span class="function">log</span>(<span class="string">'Processing:'</span>, event);
+  
+  <span class="comment">// Acknowledge le message</span>
+  channel.<span class="function">ack</span>(msg);
+});
+                </div>
+
+                <h3>4.3 AWS EventBridge</h3>
+
+                <p>Service serverless d'AWS pour créer des architectures event-driven.</p>
+
+                <div class="code-block">
+<span class="comment">// Exemple AWS EventBridge (AWS SDK)</span>
+<span class="keyword">const</span> { EventBridgeClient, PutEventsCommand } = 
+  <span class="function">require</span>(<span class="string">'@aws-sdk/client-eventbridge'</span>);
+
+<span class="keyword">const</span> client = <span class="keyword">new</span> <span class="function">EventBridgeClient</span>({ region: <span class="string">'us-east-1'</span> });
+
+<span class="keyword">const</span> params = {
+  Entries: [
+    {
+      Source: <span class="string">'order.service'</span>,
+      DetailType: <span class="string">'Order Placed'</span>,
+      Detail: JSON.<span class="function">stringify</span>({
+        orderId: <span class="string">'order-123'</span>,
+        userId: <span class="string">'user-456'</span>,
+        amount: 150.00
+      }),
+      EventBusName: <span class="string">'default'</span>
+    }
+  ]
+};
+
+<span class="keyword">await</span> client.<span class="function">send</span>(<span class="keyword">new</span> <span class="function">PutEventsCommand</span>(params));
+                </div>
+
+                <h3>4.4 Comparatif des Technologies</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Critère</th>
+                            <th>Kafka</th>
+                            <th>RabbitMQ</th>
+                            <th>AWS EventBridge</th>
+                            <th>Redis Pub/Sub</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Performance</strong></td>
+                            <td>Très haute</td>
+                            <td>Haute</td>
+                            <td>Haute</td>
+                            <td>Très haute</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Persistance</strong></td>
+                            <td>Oui</td>
+                            <td>Oui</td>
+                            <td>Non (event replay limité)</td>
+                            <td>Non</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ordering</strong></td>
+                            <td>Oui (par partition)</td>
+                            <td>Oui (par queue)</td>
+                            <td>Best effort</td>
+                            <td>Non garanti</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scalabilité</strong></td>
+                            <td>Excellente</td>
+                            <td>Bonne</td>
+                            <td>Auto (managed)</td>
+                            <td>Limitée</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complexité</strong></td>
+                            <td>Haute</td>
+                            <td>Moyenne</td>
+                            <td>Faible</td>
+                            <td>Très faible</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cas d'usage</strong></td>
+                            <td>Streaming, Big Data</td>
+                            <td>Task queues, RPC</td>
+                            <td>Intégration AWS</td>
+                            <td>Simple pub/sub</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION 5 -->
+        <div class="section" id="section5">
+            <div class="section-header">
+                <h2>5. Avantages et Inconvénients</h2>
+            </div>
+            <div class="section-content">
+                <h3>5.1 Avantages</h3>
+
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>✅ Avantages</h4>
+                        <ul>
+                            <li><strong>Découplage :</strong> Services indépendants, pas de dépendances directes</li>
+                            <li><strong>Scalabilité :</strong> Facile d'ajouter des consommateurs sans modifier les producteurs</li>
+                            <li><strong>Résilience :</strong> Échec d'un service n'affecte pas les autres</li>
+                            <li><strong>Flexibilité :</strong> Nouveaux use cases sans changer le code existant</li>
+                            <li><strong>Asynchrone :</strong> Pas de blocage, meilleure performance</li>
+                            <li><strong>Audit trail :</strong> Historique complet des événements</li>
+                            <li><strong>Real-time :</strong> Réaction immédiate aux changements</li>
+                            <li><strong>Testabilité :</strong> Services peuvent être testés indépendamment</li>
+                        </ul>
+                    </div>
+
+                    <div class="cons">
+                        <h4>❌ Inconvénients</h4>
+                        <ul>
+                            <li><strong>Complexité :</strong> Plus difficile à comprendre et débugger</li>
+                            <li><strong>Cohérence éventuelle :</strong> Pas de cohérence immédiate</li>
+                            <li><strong>Ordre des messages :</strong> Difficile à garantir entre services</li>
+                            <li><strong>Duplication :</strong> Risque de traiter le même événement plusieurs fois</li>
+                            <li><strong>Monitoring :</strong> Traçage distribué plus complexe</li>
+                            <li><strong>Testing :</strong> Tests d'intégration plus difficiles</li>
+                            <li><strong>Debugging :</strong> Flux asynchrone difficile à suivre</li>
+                            <li><strong>Infrastructure :</strong> Nécessite message broker robuste</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>5.2 Quand Utiliser l'EDA ?</h3>
+
+                <div class="alert alert-success">
+                    <strong>✅ Utilisez l'EDA quand :</strong>
+                    <ul>
+                        <li>Vous avez besoin de <strong>découplage fort</strong> entre services</li>
+                        <li>Plusieurs services doivent réagir au <strong>même événement</strong></li>
+                        <li>Vous avez des <strong>workflows asynchrones</strong> complexes</li>
+                        <li>Besoin de <strong>scalabilité</strong> horizontale importante</li>
+                        <li>Traitement en <strong>temps réel</strong> (streaming, analytics)</li>
+                        <li>Architecture <strong>microservices</strong> distribuée</li>
+                        <li>Besoin d'un <strong>audit trail</strong> complet</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-danger">
+                    <strong>❌ N'utilisez PAS l'EDA quand :</strong>
+                    <ul>
+                        <li>Application simple avec peu de services</li>
+                        <li>Besoin de <strong>cohérence forte immédiate</strong></li>
+                        <li>Opérations <strong>CRUD simples</strong></li>
+                        <li>Équipe <strong>peu expérimentée</strong> en systèmes distribués</li>
+                        <li>Infrastructure <strong>limitée</strong> (pas de message broker)</li>
+                        <li>Latence doit être <strong>minimale</strong> (synchrone plus rapide)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 6 -->
+        <div class="section" id="section6">
+            <div class="section-header">
+                <h2>6. Cas d'Usage et Exemples Pratiques</h2>
+            </div>
+            <div class="section-content">
+                <h3>6.1 E-Commerce : Traitement de Commande</h3>
+
+                <div class="example-box">
+                    <h4>📌 Scénario Complet</h4>
+                    
+                    <p><strong>Workflow :</strong> Un client passe une commande</p>
+
+                    <div class="diagram">
+                        <pre>
+1. Client passe commande
+   ↓
+2. OrderService crée la commande
+   ↓ Publie "OrderPlaced"
+   ├─→ InventoryService : Réserve le stock
+   ├─→ PaymentService : Traite le paiement
+   ├─→ NotificationService : Envoie email de confirmation
+   └─→ AnalyticsService : Log l'événement
+
+3. PaymentService termine le paiement
+   ↓ Publie "PaymentCompleted"
+   ├─→ ShippingService : Prépare l'expédition
+   └─→ OrderService : Met à jour le statut
+
+4. ShippingService expédie
+   ↓ Publie "OrderShipped"
+   ├─→ NotificationService : Envoie email de suivi
+   └─→ OrderService : Met à jour le statut
+                        </pre>
+                    </div>
+
+                    <div class="code-block">
+<span class="comment">// OrderService - Création de commande</span>
+<span class="keyword">async function</span> <span class="function">createOrder</span>(orderData) {
+  <span class="keyword">const</span> order = <span class="keyword">await</span> db.orders.<span class="function">create</span>(orderData);
+  
+  <span class="comment">// Publier l'événement</span>
+  <span class="keyword">await</span> eventBus.<span class="function">publish</span>({
+    type: <span class="string">'OrderPlaced'</span>,
+    data: {
+      orderId: order.id,
+      userId: order.userId,
+      items: order.items,
+      totalAmount: order.total
+    }
+  });
+  
+  <span class="keyword">return</span> order;
+}
+
+<span class="comment">// InventoryService - Réaction à OrderPlaced</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'OrderPlaced'</span>, <span class="keyword">async</span> (event) => {
+  <span class="keyword">const</span> { orderId, items } = event.data;
+  
+  <span class="keyword">try</span> {
+    <span class="comment">// Réserver le stock</span>
+    <span class="keyword">for</span> (<span class="keyword">const</span> item <span class="keyword">of</span> items) {
+      <span class="keyword">await</span> <span class="function">reserveStock</span>(item.productId, item.quantity);
+    }
+    
+    <span class="comment">// Publier succès</span>
+    <span class="keyword">await</span> eventBus.<span class="function">publish</span>({
+      type: <span class="string">'InventoryReserved'</span>,
+      data: { orderId }
+    });
+  } <span class="keyword">catch</span> (error) {
+    <span class="comment">// Publier échec</span>
+    <span class="keyword">await</span> eventBus.<span class="function">publish</span>({
+      type: <span class="string">'InventoryReservationFailed'</span>,
+      data: { orderId, reason: error.message }
+    });
+  }
+});
+
+<span class="comment">// NotificationService - Envoi d'emails</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'OrderPlaced'</span>, <span class="keyword">async</span> (event) => {
+  <span class="keyword">const</span> { userId, orderId } = event.data;
+  <span class="keyword">const</span> user = <span class="keyword">await</span> <span class="function">getUser</span>(userId);
+  
+  <span class="keyword">await</span> <span class="function">sendEmail</span>(user.email, {
+    subject: <span class="string">'Confirmation de commande'</span>,
+    body: <span class="string">`Votre commande ${orderId} a été confirmée`</span>
+  });
+});
+                    </div>
+                </div>
+
+                <h3>6.2 IoT : Monitoring de Capteurs</h3>
+
+                <div class="example-box">
+                    <h4>📌 Système de Monitoring Industriel</h4>
+                    
+                    <p>Des capteurs envoient des données en temps réel (température, pression, vibrations).</p>
+
+                    <div class="code-block">
+<span class="comment">// Capteur publie des événements</span>
+<span class="keyword">setInterval</span>(() => {
+  <span class="keyword">const</span> reading = {
+    sensorId: <span class="string">'sensor-001'</span>,
+    type: <span class="string">'temperature'</span>,
+    value: <span class="function">getCurrentTemperature</span>(),
+    timestamp: <span class="keyword">new</span> Date(),
+    location: <span class="string">'warehouse-A'</span>
+  };
+  
+  eventBus.<span class="function">publish</span>(<span class="string">'SensorReading'</span>, reading);
+}, 1000); <span class="comment">// Toutes les secondes</span>
+
+<span class="comment">// Service d'alerte - Détecte les anomalies</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'SensorReading'</span>, (event) => {
+  <span class="keyword">if</span> (event.type === <span class="string">'temperature'</span> && event.value > 80) {
+    eventBus.<span class="function">publish</span>(<span class="string">'TemperatureAlert'</span>, {
+      severity: <span class="string">'HIGH'</span>,
+      sensorId: event.sensorId,
+      value: event.value,
+      threshold: 80
+    });
+  }
+});
+
+<span class="comment">// Service de notification</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'TemperatureAlert'</span>, (alert) => {
+  <span class="comment">// Envoyer SMS aux responsables</span>
+  <span class="function">sendSMS</span>(alert);
+  <span class="comment">// Déclencher alarme</span>
+  <span class="function">triggerAlarm</span>(alert.sensorId);
+});
+
+<span class="comment">// Service d'analytics - Agrégation temps réel</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'SensorReading'</span>, (event) => {
+  <span class="comment">// Stocker pour analytics</span>
+  timeSeriesDB.<span class="function">insert</span>(event);
+  <span class="comment">// Mettre à jour dashboard temps réel</span>
+  dashboard.<span class="function">update</span>(event);
+});
+                    </div>
+                </div>
+
+                <h3>6.3 Finance : Trading et Transactions</h3>
+
+                <div class="example-box">
+                    <h4>📌 Système de Trading</h4>
+                    
+                    <div class="code-block">
+<span class="comment">// Événements de marché</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'MarketPriceUpdate'</span>, (event) => {
+  <span class="keyword">const</span> { symbol, price } = event;
+  
+  <span class="comment">// Vérifier les ordres limites</span>
+  <span class="keyword">const</span> triggeredOrders = <span class="function">checkLimitOrders</span>(symbol, price);
+  
+  triggeredOrders.<span class="function">forEach</span>(order => {
+    eventBus.<span class="function">publish</span>(<span class="string">'OrderTriggered'</span>, {
+      orderId: order.id,
+      symbol,
+      price,
+      quantity: order.quantity
+    });
+  });
+});
+
+<span class="comment">// Exécution d'ordre</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'OrderTriggered'</span>, <span class="keyword">async</span> (event) => {
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> execution = <span class="keyword">await</span> <span class="function">executeOrder</span>(event);
+    
+    eventBus.<span class="function">publish</span>(<span class="string">'OrderExecuted'</span>, {
+      orderId: event.orderId,
+      executionPrice: execution.price,
+      timestamp: <span class="keyword">new</span> Date()
+    });
+  } <span class="keyword">catch</span> (error) {
+    eventBus.<span class="function">publish</span>(<span class="string">'OrderFailed'</span>, {
+      orderId: event.orderId,
+      reason: error.message
+    });
+  }
+});
+
+<span class="comment">// Notification client</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'OrderExecuted'</span>, (event) => {
+  <span class="function">notifyClient</span>(event.orderId, <span class="string">'Votre ordre a été exécuté'</span>);
+});
+
+<span class="comment">// Compliance et audit</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'*'</span>, (event) => {
+  <span class="comment">// Logger tous les événements pour audit</span>
+  auditLog.<span class="function">record</span>(event);
+});
+                    </div>
+                </div>
+
+                <h3>6.4 Social Media : Notifications en Temps Réel</h3>
+
+                <div class="example-box">
+                    <h4>📌 Système de Notifications</h4>
+                    
+                    <div class="code-block">
+<span class="comment">// Événement: Nouvelle publication</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'PostCreated'</span>, <span class="keyword">async</span> (event) => {
+  <span class="keyword">const</span> { postId, authorId, content } = event;
+  
+  <span class="comment">// Récupérer les followers</span>
+  <span class="keyword">const</span> followers = <span class="keyword">await</span> <span class="function">getFollowers</span>(authorId);
+  
+  <span class="comment">// Publier événement pour chaque follower</span>
+  followers.<span class="function">forEach</span>(followerId => {
+    eventBus.<span class="function">publish</span>(<span class="string">'NewPostForUser'</span>, {
+      userId: followerId,
+      postId,
+      authorId
+    });
+  });
+});
+
+<span class="comment">// Service de notification push</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'NewPostForUser'</span>, (event) => {
+  <span class="function">sendPushNotification</span>(event.userId, {
+    title: <span class="string">'Nouvelle publication'</span>,
+    body: <span class="string">`${event.authorId} a publié quelque chose`</span>
+  });
+});
+
+<span class="comment">// Service de feed - Mise à jour du fil d'actualité</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'NewPostForUser'</span>, (event) => {
+  feedCache.<span class="function">addPost</span>(event.userId, event.postId);
+});
+
+<span class="comment">// Analytics - Tracking engagement</span>
+eventBus.<span class="function">subscribe</span>(<span class="string">'PostCreated'</span>, (event) => {
+  analytics.<span class="function">track</span>(<span class="string">'post_created'</span>, {
+    authorId: event.authorId,
+    contentLength: event.content.length,
+    timestamp: <span class="keyword">new</span> Date()
+  });
+});
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 7 -->
+        <div class="section" id="section7">
+            <div class="section-header">
+                <h2>7. Comparaison avec d'Autres Architectures</h2>
+            </div>
+            <div class="section-content">
+                <h3>7.1 EDA vs Architecture Monolithique</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Monolithique</th>
+                            <th>Event-Driven</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Couplage</strong></td>
+                            <td>Fort (modules liés)</td>
+                            <td>Faible (découplé)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Communication</strong></td>
+                            <td>Appels directs (méthodes)</td>
+                            <td>Messages asynchrones</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scalabilité</strong></td>
+                            <td>Verticale uniquement</td>
+                            <td>Horizontale par service</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Déploiement</strong></td>
+                            <td>Tout ou rien</td>
+                            <td>Indépendant par service</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Complexité</strong></td>
+                            <td>Faible initialement</td>
+                            <td>Élevée</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Temps de dev</strong></td>
+                            <td>Rapide au début</td>
+                            <td>Plus long (infrastructure)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>7.2 EDA vs API REST/RPC</h3>
+
+                <div class="diagram">
+                    <pre>
+<strong>REST/RPC (Synchrone):</strong>
+Service A ──HTTP Request──▶ Service B
+          ◀─HTTP Response──
+          (attend la réponse)
+
+<strong>Event-Driven (Asynchrone):</strong>
+Service A ──Event──▶ Message Broker ──Event──▶ Service B
+          (continue)                   (traite quand prêt)
+                    </pre>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Critère</th>
+                            <th>REST/RPC</th>
+                            <th>Event-Driven</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Mode</strong></td>
+                            <td>Synchrone</td>
+                            <td>Asynchrone</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Couplage</strong></td>
+                            <td>Services doivent se connaître</td>
+                            <td>Services indépendants</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Réponse</strong></td>
+                            <td>Immédiate</td>
+                            <td>Différée (éventuelle)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Résilience</strong></td>
+                            <td>Échoue si service down</td>
+                            <td>Messages mis en queue</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Broadcast</strong></td>
+                            <td>Difficile (N appels)</td>
+                            <td>Naturel (1 événement)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Use case</strong></td>
+                            <td>CRUD, requêtes directes</td>
+                            <td>Workflows, notifications</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>7.3 EDA vs Architecture en Microservices</h3>
+
+                <div class="alert alert-info">
+                    <strong>Note :</strong> EDA et microservices ne sont pas mutuellement exclusifs ! L'EDA est souvent utilisée <strong>DANS</strong> une architecture microservices pour la communication entre services.
+                </div>
+
+                <p><strong>Combinaison Microservices + EDA :</strong></p>
+                <ul>
+                    <li>Chaque microservice est autonome</li>
+                    <li>Communication inter-services via événements</li>
+                    <li>API REST pour les requêtes synchrones externes</li>
+                    <li>Events pour les workflows asynchrones internes</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SECTION 8 -->
+        <div class="section" id="section8">
+            <div class="section-<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Basée sur les Événements</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border-left: 4px solid #1e3c72;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .toc h2 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+        }
+        
+        .toc ul {
+            list-style: none;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+        }
+        
+        .toc a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .toc a:hover {
+            color: #1e3c72;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+            page-break-inside: avoid;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .section-header h2 {
+            font-size: 1.8em;
+        }
+        
+        .section-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-top: none;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        h3 {
+            color: #1e3c72;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        h4 {
+            color: #2a5298;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #1e3c72;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+
+        .code-block .comment {
+            color: #75715e;
+        }
+
+        .code-block .keyword {
+            color: #f92672;
+        }
+
+        .code-block .string {
+            color: #e6db74;
+        }
+
+        .code-block .function {
+            color: #66d9ef;
+        }
+        
+        .example-box {
+            background: #e8f4f8;
+            border: 2px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .example-box h4 {
+            color: #17a2b8;
+            margin-top: 0;
+        }
+
+        .diagram {
+            background: white;
+            border: 2px solid #1e3c72;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .diagram pre {
+            text-align: left;
+            display: inline-block;
+            font-family: monospace;
+            line-height: 1.4;
+        }
+        
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .highlight {
+            background: #fff9c4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .pros, .cons {
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .pros {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+
+        .cons {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+
+        .pros h4, .cons h4 {
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .pros-cons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚡ Architecture Basée sur les Événements</h1>
+        <p>Event-Driven Architecture (EDA) - Systèmes Répartis</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="toc">
+            <h2>📋 Table des Matières</h2>
+            <ul>
+                <li><a href="#section1">1. Introduction et Concepts Fondamentaux</a></li>
+                <li><a href="#section2">2. Composants d'une Architecture EDA</a></li>
+                <li><a href="#section3">3. Patterns de Communication</a></li>
+                <li><a href="#section4">4. Technologies et Implémentations</a></li>
+                <li><a href="#section5">5. Avantages et Inconvénients</a></li>
+                <li><a href="#section6">6. Cas d'Usage et Exemples Pratiques</a></li>
+                <li><a href="#section7">7. Comparaison avec d'Autres Architectures</a></li>
+                <li><a href="#section8">8. Défis et Bonnes Pratiques</a></li>
+            </ul>
+        </div>
+
+        <!-- SECTION 1 -->
+        <div class="section" id="section1">
+            <div class="section-header">
+                <h2>1. Introduction et Concepts Fondamentaux</h2>
+            </div>
+            <div class="section-content">
+                <h3>1.1 Qu'est-ce qu'une Architecture Basée sur les Événements ?</h3>
+                
+                <div class="alert alert-info">
+                    <strong>Définition :</strong> Une architecture basée sur les événements (Event-Driven Architecture - EDA) est un paradigme de conception logicielle où les composants du système communiquent en produisant et en consommant des <strong>événements</strong> plutôt que par des appels directs synchrones.
+                </div>
+
+                <p>Dans une EDA, un <strong>événement</strong> représente un changement d'état significatif dans le système. Par exemple :</p>
+                <ul>
+                    <li>"Une commande a été passée"</li>
+                    <li>"Un utilisateur s'est inscrit"</li>
+                    <li>"Le stock d'un produit est faible"</li>
+                    <li>"Un paiement a été validé"</li>
+                </ul>
+
+                <h3>1.2 Concepts Clés</h3>
+
+                <h4>Événement (Event)</h4>
+                <p>Un événement est un message qui décrit quelque chose qui s'est produit dans le passé. Il contient généralement :</p>
+                <ul>
+                    <li><strong>Type d'événement :</strong> Ex: "OrderPlaced", "UserRegistered"</li>
+                    <li><strong>Timestamp :</strong> Quand l'événement s'est produit</li>
+                    <li><strong>Données :</strong> Informations contextuelles (ID utilisateur, montant, etc.)</li>
+                    <li><strong>Source :</strong> Quel service a émis l'événement</li>
+                </ul>
+
+                <div class="code-block">
+<span class="comment">// Exemple d'événement JSON</span>
+{
+  <span class="string">"eventType"</span>: <span class="string">"OrderPlaced"</span>,
+  <span class="string">"eventId"</span>: <span class="string">"evt-12345"</span>,
+  <span class="string">"timestamp"</span>: <span class="string">"2025-10-14T10:30:00Z"</span>,
+  <span class="string">"source"</span>: <span class="string">"order-service"</span>,
+  <span class="string">"data"</span>: {
+    <span class="string">"orderId"</span>: <span class="string">"ord-789"</span>,
+    <span class="string">"userId"</span>: <span class="string">"user-456"</span>,
+    <span class="string">"amount"</span>: 150.00,
+    <span class="string">"items"</span>: [
+      { <span class="string">"productId"</span>: <span class="string">"prod-111"</span>, <span class="string">"quantity"</span>: 2 }
+    ]
+  }
+}
+                </div>
+
+                <h4>Producteur (Producer)</h4>
+                <p>Un composant qui génère et publie des événements quand quelque chose d'important se produit.</p>
+
+                <h4>Consommateur (Consumer)</h4>
+                <p>Un composant qui écoute et réagit aux événements qui l'intéressent.</p>
+
+                <h4>Canal d'Événements (Event Channel/Bus)</h4>
+                <p>Le mécanisme de transport qui achemine les événements des producteurs vers les consommateurs.</p>
+
+                <h3>1.3 Principe de Fonctionnement</h3>
+
+                <div class="diagram">
+                    <pre>
+┌─────────────┐         ┌──────────────────┐         ┌─────────────┐
+│  Producer   │         │   Event Bus      │         │  Consumer 1 │
+│  (Service)  │──emit──▶│  (Message Queue) │──route─▶│  (Service)  │
+└─────────────┘         │                  │         └─────────────┘
+                        │                  │         ┌─────────────┐
+                        │                  │──route─▶│  Consumer 2 │
+                        └──────────────────┘         │  (Service)  │
+                                                     └─────────────┘
+
+Flux:
+1. Le Producer détecte un changement d'état
+2. Il crée un événement et le publie sur l'Event Bus
+3. L'Event Bus distribue l'événement aux Consumers intéressés
+4. Chaque Consumer traite l'événement de manière indépendante
+                    </pre>
+                </div>
+
+                <h3>1.4 Caractéristiques Principales</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Caractéristique</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Couplage Faible</strong></td>
+                            <td>Les producteurs ne connaissent pas les consommateurs (et vice-versa)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Asynchrone</strong></td>
+                            <td>Les producteurs n'attendent pas de réponse immédiate</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Réactif</strong></td>
+                            <td>Les systèmes réagissent aux événements en temps réel</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scalable</strong></td>
+                            <td>Facile d'ajouter de nouveaux consommateurs sans modifier le producteur</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Résilient</strong></td>
+                            <td>La défaillance d'un consommateur n'affecte pas les autres</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div class="section" id="section2">
+            <div class="section-header">
+                <h2>2. Composants d'une Architecture EDA</h2>
+            </div>
+            <div class="section-content">
+                <h3>2.1 Architecture Générale</h3>
+
+                <div class="diagram">
+                    <pre>
+┌─────────────────────────────────────────────────────────────┐
+│                    APPLICATION LAYER                        │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │ Service A│  │ Service B│  │ Service C│  │ Service D│   │
+│  │(Producer)│  │(Consumer)│  │(Producer)│  │(Consumer)│   │
+│  └────┬─────┘  └─────▲────┘  └────┬─────┘  └─────▲────┘   │
+└───────┼──────────────┼────────────┼──────────────┼─────────┘
+        │              │            │              │
+        │   publish    │ subscribe  │   publish    │ subscribe
+        ▼              │            ▼              │
+┌─────────────────────────────────────────────────────────────┐
+│                  EVENT BUS / MESSAGE BROKER                 │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │   Topic 1    │  │   Topic 2    │  │   Topic 3    │     │
+│  │ OrderEvents  │  │ UserEvents   │  │ PaymentEvents│     │
+│  └──────────────┘  └──────────────┘  └──────────────┘     │
+└─────────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+                  ┌────────────────┐
+                  │  Event Store   │
+                  │  (Persistent)  │
+                  └────────────────┘
+                    </pre>
+                </div>
+
+                <h3>2.2 Les Composants Détaillés</h3>
+
+                <h4>A. Event Producer (Producteur)</h4>
+                <p>Rôle : Détecte les changements d'état et génère des événements.</p>
+
+                <div class="code-block">
+<span class="comment">// Exemple en Node.js avec EventEmitter</span>
+<span class="keyword">class</span> <span class="function">OrderService</span> {
+  <span class="keyword">constructor</span>(eventBus) {
+    <span class="keyword">this</span>.eventBus = eventBus;
+  }
+
+  <span class="function">createOrder</span>(orderData) {
+    <span class="comment">// Logique métier</span>
+    <span class="keyword">const</span> order = <span class="keyword">this</span>.saveOrder(orderData);
+    
+    <span class="comment">// Publier l'événement</span>
+    <span class="keyword">this</span>.eventBus.<span class="function">publish</span>(<span class="string">'OrderPlaced'</span>, {
+      orderId: order.id,
+      userId: order.userId,
+      amount: order.amount,
+      timestamp: <span class="keyword">new</span> Date()
+    });
+    
+    <span class="keyword">return</span> order;
+  }
+}
+                </div>
+
+                <h4>B. Event Consumer (Consommateur)</h4>
+                <p>Rôle : Écoute et traite les événements pertinents.</p>
+
+                <div class="code-block">
+<span class="comment">// Service d'inventaire qui réagit aux commandes</span>
+<span class="keyword">class</span> <span class="function">InventoryService</span> {
+  <span class="keyword">constructor</span>(eventBus) {
+    <span class="comment">// S'abonner à l'événement</span>
+    eventBus.<span class="function">subscribe</span>(<span class="string">'OrderPlaced'</span>, <span class="keyword">this</span>.handleOrderPlaced);
+  }
+
+  <span class="function">handleOrderPlaced</span>(event) {
+    <span class="keyword">const</span> { orderId, items } = event.data;
+    
+    <span class="comment">// Mettre à jour le stock</span>
+    items.<span class="function">forEach</span>(item => {
+      <span class="keyword">this</span>.<span class="function">decrementStock</span>(item.productId, item.quantity);
+    });
+    
+    console.<span class="function">log</span>(<span class="string">`Stock updated for order ${orderId}`</span>);
+  }
+}
+                </div>
+
+                <h4>C. Event Bus / Message Broker</h4>
+                <p>Rôle : Infrastructure de messagerie qui achemine les événements.</p>
+
+                <p><strong>Technologies courantes :</strong></p>
+                <ul>
+                    <li><strong>Apache Kafka :</strong> Haute performance, distribué, persistant</li>
+                    <li><strong>RabbitMQ :</strong> AMQP, flexible, routage complexe</li>
+                    <li><strong>AWS EventBridge :</strong> Serverless, intégration AWS</li>
+                    <li><strong>Azure Event Hubs :</strong> Streaming d'événements à grande échelle</li>
+                    <li><strong>Google Pub/Sub :</strong> Messagerie asynchrone globale</li>
+                    <li><strong>Redis Pub/Sub :</strong> Léger, en mémoire</li>
+                </ul>
+
+                <h4>D. Event Store (Optionnel)</h4>
+                <p>Base de données spécialisée qui stocke tous les événements de manière immuable.</p>
+                <p><strong>Utilisé pour :</strong></p>
+                <ul>
+                    <li>Event Sourcing</li>
+                    <li>Audit et traçabilité</li>
+                    <li>Rejeu d'événements</li>
+                    <li>Debug et analyse</li>
+                </ul>
+
+                <h3>2.3 Types d'Event Channels</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Cas d'usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Point-to-Point</strong></td>
+                            <td>Un événement → Un seul consommateur</td>
+                            <td>Tâches à exécuter une seule fois</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Publish-Subscribe</strong></td>
+                            <td>Un événement → Plusieurs consommateurs</td>
+                            <td>Notifications, broadcasting</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Event Streaming</strong></td>
+                            <td>Flux continu d'événements</td>
+                            <td>Analytics temps réel, monitoring</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div class="section" id="section3">
+            <div class="section-header">
+                <h2>3. Patterns de Communication</h2>
+            </div>
+            <div class="section-content">
+                <h3>3.1 Event Notification</h3>
+                
+                <p>Le pattern le plus simple : un service notifie qu'un événement s'est produit, avec des données minimales.</p>
+
+                <div class="example-box">
+                    <h4>📌 Exemple : Notification d'inscription</h4>
+                    <div class="code-block">
+<span class="comment">// Événement de notification simple</span>
+{
+  <span class="string">"eventType"</span>: <span class="string">"UserRegistered"</span>,
+  <span class="string">"userId"</span>: <span class="string">"user-123"</span>,
+  <span class="string">"timestamp"</span>: <span class="string">"2025-10-14T10:30:00Z"</span>
+}
+
+<span class="comment">// Les consommateurs récupèrent les détails si nécessaire</span>
+                    </div>
+                    <p><strong>Avantage :</strong> Couplage minimal, événements légers</p>
+                    <p><strong>Inconvénient :</strong> Consommateurs doivent faire des appels supplémentaires</p>
+                </div>
+
+                <h3>3.2 Event-Carried State Transfer</h3>
+
+                <p>L'événement contient toutes les données nécessaires pour que les consommateurs n'aient pas à faire de requêtes supplémentaires.</p>
+
+                <div class="example-box">
+                    <h4>📌 Exemple : État complet dans l'événement</h4>
+                    <div class="code-block">
+{
+  <span class="string">"eventType"</span>: <span class="string">"UserRegistered"</span>,
+  <span class="string">"userId"</span>: <span class="string">"user-123"</span>,
+  <span class="string">"timestamp"</span>: <span class="string">"2025-10-14T10:30:00Z"</span>,
+  <span class="string">"userData"</span>: {
+    <span class="string">"email"</span>: <span class="string">"user@example.com"</span>,
+    <span class="string">"name"</span>: <span class="string">"John Doe"</span>,
+    <span class="string">"country"</span>: <span class="string">"Tunisia"</span>,
+    <span class="string">"subscriptionPlan"</span>: <span class="string">"premium"</span>
+  }
+}
+                    </div>
+                    <p><strong>Avantage :</strong> Pas de requêtes supplémentaires, autonomie</p>
+                    <p><strong>Inconvénient :</strong> Événements plus gros, possible duplication de données</p>
+                </div>
+
+                <h3>3.3 Event Sourcing</h3>
+
+                <p>Tous les changements d'état sont stockés comme une séquence d'événements. L'état actuel est reconstruit en rejouant les événements.</p>
+
+                <div class="diagram">
+                    <pre>
+État du Compte Bancaire via Event Sourcing:
+
+Events:
+1. AccountCreated    { accountId: "acc-001", balance: 0 }
+2. MoneyDeposited    { amount: 1000, timestamp: "..." }
+3. MoneyWithdrawn    { amount: 200, timestamp: "..." }
+4. MoneyDeposited    { amount: 500, timestamp: "..." }
+
+État actuel = Rejeu de tous les événements
+Balance finale = 0 + 1000 - 200 + 500 = 1300
+                    </pre>
+                </div>
+
+                <div class="alert alert-success">
+                    <strong>Avantages Event Sourcing :</strong>
+                    <ul>
+                        <li>Audit trail complet</li>
+                        <li>Possibilité de "time travel" (voir l'état à n'importe quel moment)</li>
+                        <li>Debug facilité</li>
+                        <li>Possibilité de rejouer les événements</li>
+                    </ul>
+                </div>
+
+                <h3>3.4 CQRS (Command Query Responsibility Segregation)</h3>
+
+                <p>Souvent combiné avec Event Sourcing : séparer les opérations de lecture et d'écriture.</p>
+
+                <div class="diagram">
+                    <pre>
+┌──────────┐                          ┌────────────┐
+│ COMMAND  │  ──write──▶              │ Write Model│
+│  (Write) │             Event Store  │ (Domain)   │
+└──────────┘                          └────────────┘
+                                             │
+                                             │ Events
+                                             ▼
+                                      ┌────────────┐
+┌──────────┐                          │ Read Model │
+│  QUERY   │  ◀──read──               │ (Projections)
+│  (Read)  │            Optimized DB  │            │
+└──────────┘                          └────────────┘
+                    </pre>
+                </div>
+
+                <h3>3.5 Saga Pattern</h3>
+
+                <p>Pour gérer les transactions distribuées via une séquence d'événements et de compensations.</p>
+
+                <div class="example-box">
+                    <h4>📌 Exemple : Saga de Commande</h4>
+                    <div class="code-block">
+<span class="comment">// Scénario: Créer une commande avec paiement et livraison</span>
+
+1. OrderCreated           → Success
+2. PaymentRequested       → Success
+3. InventoryReserved      → <span class="keyword">FAIL</span> (stock insuffisant)
+
+<span class="comment">// Compensation (rollback)</span>
+4. PaymentRefunded
+5. OrderCancelled
+
+<span class="comment">// Événements de compensation publiés automatiquement</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4 -->
+        <div class="section" id="section4">
+            <div class="section-header">
+                <h2>4. Technologies et Implémentations</h2>
+            </div>
+            <div class="section-content">
+                <h3>4.1 Apache Kafka</h3>
+
+                <p>Plateforme de streaming distribuée, leader du marché pour l'EDA.</p>
+
+                <h4>Caractéristiques :</h4>
+                <ul>
+                    <li>Haute performance (millions de messages/sec)</li>
+                    <li>Persistance sur disque</li>
+                    <li>Réplication et tolérance aux pannes</li>
+                    <li>Rétention configurable des messages</li>
+                    <li>Partitionnement pour scalabilité horizontale</li>
+                </ul>
+
+                <div class="code-block">
+<span class="comment">// Exemple Producer Kafka (Node.js)</span>
+<span class="keyword">const</span> { Kafka } = <span class="function">require</span>(<span class="string">'kafkajs'</span>);
+
+<span class="keyword">const</span> kafka = <span class="keyword">new</span> <span class="function">Kafka</span>({
+  clientId: <span class="string">'order-service'</span>,
+  brokers: [<span class="string">'localhost:9092'</span>]
+});
+
+<span class="keyword">const</span> producer = kafka.<span class="function">producer</span>();
+
+<span class="keyword">await</span> producer.<span class="function">connect</span>();
+<span class="keyword">await</span> producer.<span class="function">send</span>({
+  topic: <span class="string">'order-events'</span>,
+  messages: [
+    {
+      key: <span class="string">'order-123'</span>,
+      value: JSON.<span class="function">stringify</span>({
+        eventType: <span class="string">'OrderPlaced'</span>,
+        orderId: <span class="string">'order-123'</span>,
+        amount: 150.00
+      })
+    }
+  ]
+});
+
+<span class="comment">// Consumer Kafka</span>
+<span class="keyword">const</span> consumer = kafka.<span class="function">consumer</span>({ groupId: <span class="string">'inventory-service'</span> });
+
+<span class="keyword">await</span> consumer.<span class="function">connect</span>();
+<span class="keyword">await</span> consumer.<span class="function">subscribe</span>({ topic: <span class="string">'order-events'</span> });
+
+<span class="keyword">await</span> consumer.<span class="function">run</span>({
+  <span class="function">eachMessage</span>: <span class="keyword">async</span> ({ topic, partition, message }) => {
+    <span class="keyword">const</span> event = JSON.<span class="function">parse</span>(message.value.<span class="function">toString</span>());
+    console.<span class="function">log</span>(<span class="string">'Received event:'</span>, event);
+    <span class="comment">// Traiter l'événement</span>
+    <span class="keyword">await</span> <span class="function">processOrder</span>(event);
+  }
+});

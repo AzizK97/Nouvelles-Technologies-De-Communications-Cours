@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture REST - Cas Ludo E-commerce</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        h2 {
+            color: #1e3c72;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #1e3c72;
+            font-size: 1.8em;
+        }
+        
+        h3 {
+            color: #2a5298;
+            margin: 25px 0 15px 0;
+            font-size: 1.4em;
+        }
+        
+        .architecture-diagram {
+            background: #f8f9fa;
+            border: 2px solid #1e3c72;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        
+        .layer {
+            background: white;
+            border: 2px solid #2a5298;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .layer-title {
+            font-weight: bold;
+            color: #1e3c72;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .api-endpoint {
+            background: #e8f4f8;
+            border-left: 5px solid #2a5298;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+        
+        .get { background: #28a745; color: white; }
+        .post { background: #007bff; color: white; }
+        .put { background: #ffc107; color: #333; }
+        .delete { background: #dc3545; color: white; }
+        
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            color: #1e3c72;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .description {
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        
+        .code-example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .json-key {
+            color: #66d9ef;
+        }
+        
+        .json-string {
+            color: #a6e22e;
+        }
+        
+        .json-number {
+            color: #ae81ff;
+        }
+        
+        .resource-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .resource-table th {
+            background: #1e3c72;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 1.05em;
+        }
+        
+        .resource-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .resource-table tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .highlight {
+            background: #d1ecf1;
+            border-left: 5px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .server-info {
+            display: inline-block;
+            background: #e8f4f8;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin: 5px;
+            border: 1px solid #2a5298;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏢 Architecture REST - Cas Ludo</h1>
+            <p class="subtitle">Application de Commerce Électronique - Système de gestion des ressources</p>
+        </header>
+        
+        <div class="content">
+            <h2>1. Contexte du Projet</h2>
+            <p>
+                L'entreprise Ludo, leader français de la vente par correspondance de jeux et jouets, 
+                met en place une application de commerce électronique avec les serveurs suivants :
+            </p>
+            <div style="margin: 20px 0;">
+                <span class="server-info">🌐 Serveur Web (179.169.10.106)</span>
+                <span class="server-info">📧 Serveur Messagerie (179.169.10.108)</span>
+                <span class="server-info">🔍 Serveur DNS (179.169.10.107)</span>
+            </div>
+
+            <h2>2. Architecture Globale</h2>
+            <div class="architecture-diagram">
+                <div class="layer">
+                    <div class="layer-title">🌍 Clients (Internet)</div>
+                    <p>Applications web, mobiles, externes</p>
+                </div>
+                <div style="font-size: 2em; color: #1e3c72;">↓ HTTP/HTTPS ↓</div>
+                <div class="layer">
+                    <div class="layer-title">🛡️ Zone Démilitarisée (DMZ)</div>
+                    <p>Serveur Web (API REST) - 179.169.10.106</p>
+                    <p>Serveur DNS - 179.169.10.107</p>
+                    <p>Serveur Messagerie - 179.169.10.108</p>
+                </div>
+                <div style="font-size: 2em; color: #1e3c72;">↓ Pare-feu R2 ↓</div>
+                <div class="layer">
+                    <div class="layer-title">🏢 Réseau Local Protégé</div>
+                    <p>Serveur SGBD (192.168.1.2)</p>
+                    <p>Serveur Application (192.168.1.3)</p>
+                    <p>Serveur Fichiers (192.168.1.1)</p>
+                    <p>Serveur DHCP (192.168.1.4)</p>
+                </div>
+            </div>
+
+            <h2>3. Ressources Principales de l'API REST</h2>
+            
+            <h3>3.1 Ressource : Produits (Jouets)</h3>
+            <p>Gestion du catalogue de jeux et jouets</p>
+            
+            <table class="resource-table">
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/produits</code></td>
+                        <td>Lister tous les produits</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/produits/{id}</code></td>
+                        <td>Détails d'un produit spécifique</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td><code>/api/v1/produits</code></td>
+                        <td>Ajouter un nouveau produit</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td><code>/api/v1/produits/{id}</code></td>
+                        <td>Mettre à jour un produit</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method delete">DELETE</span></td>
+                        <td><code>/api/v1/produits/{id}</code></td>
+                        <td>Supprimer un produit</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">https://ludo-club.fr/api/v1/produits</span>
+                <div class="description">Récupère la liste complète des produits disponibles</div>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"produits"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Robot éducatif"</span>,
+      <span class="json-key">"categorie"</span>: <span class="json-string">"Jouets électroniques"</span>,
+      <span class="json-key">"prix"</span>: <span class="json-number">49.99</span>,
+      <span class="json-key">"stock"</span>: <span class="json-number">150</span>,
+      <span class="json-key">"description"</span>: <span class="json-string">"Robot pour apprendre la programmation"</span>,
+      <span class="json-key">"ageMin"</span>: <span class="json-number">8</span>,
+      <span class="json-key">"photo"</span>: <span class="json-string">"/images/robot-001.jpg"</span>
+    },
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Puzzle géographique"</span>,
+      <span class="json-key">"categorie"</span>: <span class="json-string">"Jeux éducatifs"</span>,
+      <span class="json-key">"prix"</span>: <span class="json-number">24.99</span>,
+      <span class="json-key">"stock"</span>: <span class="json-number">200</span>,
+      <span class="json-key">"description"</span>: <span class="json-string">"Puzzle de la carte du monde"</span>,
+      <span class="json-key">"ageMin"</span>: <span class="json-number">6</span>,
+      <span class="json-key">"photo"</span>: <span class="json-string">"/images/puzzle-geo-001.jpg"</span>
+    }
+  ],
+  <span class="json-key">"total"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"page"</span>: <span class="json-number">1</span>
+}
+            </div>
+
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">https://ludo-club.fr/api/v1/produits/1</span>
+                <div class="description">Récupère les détails d'un produit spécifique</div>
+            </div>
+
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-url">https://ludo-club.fr/api/v1/produits</span>
+                <div class="description">Créer un nouveau produit (Admin uniquement)</div>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">Request Body</span>:
+{
+  <span class="json-key">"nom"</span>: <span class="json-string">"Jeu de construction écologique"</span>,
+  <span class="json-key">"categorie"</span>: <span class="json-string">"Construction"</span>,
+  <span class="json-key">"prix"</span>: <span class="json-number">34.99</span>,
+  <span class="json-key">"stock"</span>: <span class="json-number">100</span>,
+  <span class="json-key">"description"</span>: <span class="json-string">"Blocs en bois recyclé"</span>,
+  <span class="json-key">"ageMin"</span>: <span class="json-number">4</span>
+}
+
+<span class="json-key">Response</span> (201 Created):
+<span class="json-key">Location</span>: /api/v1/produits/3
+{
+  <span class="json-key">"id"</span>: <span class="json-number">3</span>,
+  <span class="json-key">"nom"</span>: <span class="json-string">"Jeu de construction écologique"</span>,
+  <span class="json-key">"categorie"</span>: <span class="json-string">"Construction"</span>,
+  <span class="json-key">"prix"</span>: <span class="json-number">34.99</span>,
+  <span class="json-key">"stock"</span>: <span class="json-number">100</span>,
+  <span class="json-key">"dateCreation"</span>: <span class="json-string">"2025-10-21T10:30:00Z"</span>
+}
+            </div>
+
+            <h3>3.2 Ressource : Clients</h3>
+            <p>Gestion des comptes clients</p>
+
+            <table class="resource-table">
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/clients/{id}</code></td>
+                        <td>Profil du client</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td><code>/api/v1/clients</code></td>
+                        <td>Créer un compte client</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td><code>/api/v1/clients/{id}</code></td>
+                        <td>Modifier le profil</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="code-example">
+<span class="json-key">GET</span> /api/v1/clients/42
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"id"</span>: <span class="json-number">42</span>,
+  <span class="json-key">"nom"</span>: <span class="json-string">"Dupont"</span>,
+  <span class="json-key">"prenom"</span>: <span class="json-string">"Marie"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"marie.dupont@email.fr"</span>,
+  <span class="json-key">"telephone"</span>: <span class="json-string">"0612345678"</span>,
+  <span class="json-key">"adresse"</span>: {
+    <span class="json-key">"rue"</span>: <span class="json-string">"15 rue de la République"</span>,
+    <span class="json-key">"ville"</span>: <span class="json-string">"Paris"</span>,
+    <span class="json-key">"codePostal"</span>: <span class="json-string">"75001"</span>
+  },
+  <span class="json-key">"dateInscription"</span>: <span class="json-string">"2024-03-15"</span>,
+  <span class="json-key">"lienCommandes"</span>: <span class="json-string">"/api/v1/clients/42/commandes"</span>
+}
+            </div>
+
+            <h3>3.3 Ressource : Commandes</h3>
+            <p>Gestion des commandes clients</p>
+
+            <table class="resource-table">
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/commandes</code></td>
+                        <td>Liste des commandes</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/commandes/{id}</code></td>
+                        <td>Détails d'une commande</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td><code>/api/v1/commandes</code></td>
+                        <td>Créer une nouvelle commande</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td><code>/api/v1/commandes/{id}</code></td>
+                        <td>Modifier une commande</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/clients/{id}/commandes</code></td>
+                        <td>Commandes d'un client</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-url">https://ludo-club.fr/api/v1/commandes</span>
+                <div class="description">Créer une nouvelle commande</div>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">Request Body</span>:
+{
+  <span class="json-key">"clientId"</span>: <span class="json-number">42</span>,
+  <span class="json-key">"articles"</span>: [
+    {
+      <span class="json-key">"produitId"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"quantite"</span>: <span class="json-number">2</span>
+    },
+    {
+      <span class="json-key">"produitId"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"quantite"</span>: <span class="json-number">1</span>
+    }
+  ],
+  <span class="json-key">"adresseLivraison"</span>: {
+    <span class="json-key">"rue"</span>: <span class="json-string">"15 rue de la République"</span>,
+    <span class="json-key">"ville"</span>: <span class="json-string">"Paris"</span>,
+    <span class="json-key">"codePostal"</span>: <span class="json-string">"75001"</span>
+  },
+  <span class="json-key">"modePaiement"</span>: <span class="json-string">"carte_bancaire"</span>
+}
+
+<span class="json-key">Response</span> (201 Created):
+<span class="json-key">Location</span>: /api/v1/commandes/1001
+{
+  <span class="json-key">"id"</span>: <span class="json-number">1001</span>,
+  <span class="json-key">"clientId"</span>: <span class="json-number">42</span>,
+  <span class="json-key">"dateCommande"</span>: <span class="json-string">"2025-10-21T14:30:00Z"</span>,
+  <span class="json-key">"statut"</span>: <span class="json-string">"en_attente_paiement"</span>,
+  <span class="json-key">"montantTotal"</span>: <span class="json-number">124.97</span>,
+  <span class="json-key">"articles"</span>: [
+    {
+      <span class="json-key">"produitId"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Robot éducatif"</span>,
+      <span class="json-key">"quantite"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"prixUnitaire"</span>: <span class="json-number">49.99</span>
+    },
+    {
+      <span class="json-key">"produitId"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Puzzle géographique"</span>,
+      <span class="json-key">"quantite"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"prixUnitaire"</span>: <span class="json-number">24.99</span>
+    }
+  ],
+  <span class="json-key">"lienPaiement"</span>: <span class="json-string">"/api/v1/commandes/1001/paiement"</span>
+}
+            </div>
+
+            <div class="api-endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-url">https://ludo-club.fr/api/v1/clients/42/commandes</span>
+                <div class="description">Récupérer toutes les commandes d'un client</div>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"commandes"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">1001</span>,
+      <span class="json-key">"dateCommande"</span>: <span class="json-string">"2025-10-21T14:30:00Z"</span>,
+      <span class="json-key">"statut"</span>: <span class="json-string">"livree"</span>,
+      <span class="json-key">"montantTotal"</span>: <span class="json-number">124.97</span>
+    },
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">998</span>,
+      <span class="json-key">"dateCommande"</span>: <span class="json-string">"2025-09-15T10:00:00Z"</span>,
+      <span class="json-key">"statut"</span>: <span class="json-string">"livree"</span>,
+      <span class="json-key">"montantTotal"</span>: <span class="json-number">89.50</span>
+    }
+  ],
+  <span class="json-key">"total"</span>: <span class="json-number">2</span>
+}
+            </div>
+
+            <h3>3.4 Ressource : Stock (Entrepôt)</h3>
+            <p>Gestion du stock dans l'entrepôt</p>
+
+            <table class="resource-table">
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/stock</code></td>
+                        <td>État du stock global</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/stock/{produitId}</code></td>
+                        <td>Stock d'un produit</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method put">PUT</span></td>
+                        <td><code>/api/v1/stock/{produitId}</code></td>
+                        <td>Mettre à jour le stock</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.5 Ressource : Catégories</h3>
+
+            <table class="resource-table">
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/categories</code></td>
+                        <td>Liste des catégories</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/categories/{id}/produits</code></td>
+                        <td>Produits d'une catégorie</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>4. Sécurité et Authentification</h2>
+            
+            <div class="highlight">
+                <h3>4.1 Authentification JWT</h3>
+                <p>Les clients doivent s'authentifier pour accéder aux ressources protégées.</p>
+            </div>
+
+            <div class="api-endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-url">https://ludo-club.fr/api/v1/auth/login</span>
+                <div class="description">Connexion et obtention du token JWT</div>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">Request</span>:
+{
+  <span class="json-key">"email"</span>: <span class="json-string">"marie.dupont@email.fr"</span>,
+  <span class="json-key">"motDePasse"</span>: <span class="json-string">"********"</span>
+}
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"token"</span>: <span class="json-string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>,
+  <span class="json-key">"expiresIn"</span>: <span class="json-number">3600</span>,
+  <span class="json-key">"clientId"</span>: <span class="json-number">42</span>
+}
+
+<span class="json-key">Utilisation du token</span>:
+GET /api/v1/clients/42/commandes
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+            </div>
+
+            <h2>5. Règles de Filtrage et Accès</h2>
+            
+            <div class="note">
+                <h3>🛡️ Configuration du Pare-feu (Routeur R2)</h3>
+                <p><strong>Accès autorisés depuis Internet vers la DMZ :</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Port 80 (HTTP) → Serveur Web (179.169.10.106)</li>
+                    <li>Port 443 (HTTPS) → Serveur Web (179.169.10.106)</li>
+                    <li>Port 53 (DNS) → Serveur DNS (179.169.10.107)</li>
+                    <li>Port 25 (SMTP) → Serveur Messagerie (179.169.10.108)</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>Accès bloqués :</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Port 22 (SSH) - Sauf depuis 195.65.21.4 (maintenance)</li>
+                    <li>Port 23 (Telnet) - Totalement bloqué</li>
+                </ul>
+            </div>
+
+            <h2>6. Exemples d'Utilisation Complète</h2>
+
+            <h3>6.1 Scénario : Un client achète des jouets</h3>
+            
+            <div class="highlight">
+                <p><strong>Étape 1 :</strong> Consultation du catalogue</p>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">GET</span> https://ludo-club.fr/api/v1/produits?categorie=educatif&ageMin=6
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"produits"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Puzzle géographique"</span>,
+      <span class="json-key">"prix"</span>: <span class="json-number">24.99</span>,
+      <span class="json-key">"stock"</span>: <span class="json-number">200</span>,
+      <span class="json-key">"lien"</span>: <span class="json-string">"/api/v1/produits/2"</span>
+    },
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">5</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Kit scientifique junior"</span>,
+      <span class="json-key">"prix"</span>: <span class="json-number">39.99</span>,
+      <span class="json-key">"stock"</span>: <span class="json-number">75</span>,
+      <span class="json-key">"lien"</span>: <span class="json-string">"/api/v1/produits/5"</span>
+    }
+  ]
+}
+            </div>
+
+            <div class="highlight">
+                <p><strong>Étape 2 :</strong> Consulter les détails d'un produit</p>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">GET</span> https://ludo-club.fr/api/v1/produits/2
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"nom"</span>: <span class="json-string">"Puzzle géographique"</span>,
+  <span class="json-key">"categorie"</span>: <span class="json-string">"Jeux éducatifs"</span>,
+  <span class="json-key">"prix"</span>: <span class="json-number">24.99</span>,
+  <span class="json-key">"stock"</span>: <span class="json-number">200</span>,
+  <span class="json-key">"description"</span>: <span class="json-string">"Puzzle magnétique de 100 pièces représentant la carte du monde avec les pays, capitales et monuments célèbres"</span>,
+  <span class="json-key">"ageMin"</span>: <span class="json-number">6</span>,
+  <span class="json-key">"ageMax"</span>: <span class="json-number">12</span>,
+  <span class="json-key">"dimensions"</span>: <span class="json-string">"60x40 cm"</span>,
+  <span class="json-key">"poids"</span>: <span class="json-string">"800g"</span>,
+  <span class="json-key">"photos"</span>: [
+    <span class="json-string">"/images/puzzle-geo-001.jpg"</span>,
+    <span class="json-string">"/images/puzzle-geo-002.jpg"</span>
+  ],
+  <span class="json-key">"avis"</span>: {
+    <span class="json-key">"notemoyenne"</span>: <span class="json-number">4.8</span>,
+    <span class="json-key">"nombreAvis"</span>: <span class="json-number">156</span>,
+    <span class="json-key">"lien"</span>: <span class="json-string">"/api/v1/produits/2/avis"</span>
+  }
+}
+            </div>
+
+            <div class="highlight">
+                <p><strong>Étape 3 :</strong> Créer un compte client (inscription)</p>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">POST</span> https://ludo-club.fr/api/v1/clients
+
+<span class="json-key">Request Body</span>:
+{
+  <span class="json-key">"nom"</span>: <span class="json-string">"Martin"</span>,
+  <span class="json-key">"prenom"</span>: <span class="json-string">"Sophie"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"sophie.martin@email.fr"</span>,
+  <span class="json-key">"motDePasse"</span>: <span class="json-string">"SecurePass123!"</span>,
+  <span class="json-key">"telephone"</span>: <span class="json-string">"0623456789"</span>,
+  <span class="json-key">"adresse"</span>: {
+    <span class="json-key">"rue"</span>: <span class="json-string">"8 avenue des Champs"</span>,
+    <span class="json-key">"ville"</span>: <span class="json-string">"Lyon"</span>,
+    <span class="json-key">"codePostal"</span>: <span class="json-string">"69001"</span>,
+    <span class="json-key">"pays"</span>: <span class="json-string">"France"</span>
+  }
+}
+
+<span class="json-key">Response</span> (201 Created):
+<span class="json-key">Location</span>: /api/v1/clients/43
+{
+  <span class="json-key">"id"</span>: <span class="json-number">43</span>,
+  <span class="json-key">"nom"</span>: <span class="json-string">"Martin"</span>,
+  <span class="json-key">"prenom"</span>: <span class="json-string">"Sophie"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"sophie.martin@email.fr"</span>,
+  <span class="json-key">"dateInscription"</span>: <span class="json-string">"2025-10-21"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"Compte créé avec succès. Veuillez vérifier votre email."</span>
+}
+            </div>
+
+            <div class="highlight">
+                <p><strong>Étape 4 :</strong> Authentification</p>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">POST</span> https://ludo-club.fr/api/v1/auth/login
+
+<span class="json-key">Request Body</span>:
+{
+  <span class="json-key">"email"</span>: <span class="json-string">"sophie.martin@email.fr"</span>,
+  <span class="json-key">"motDePasse"</span>: <span class="json-string">"SecurePass123!"</span>
+}
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"token"</span>: <span class="json-string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQzLCJlbWFpbCI6InNvcGhpZS5tYXJ0aW5AZW1haWwuZnIiLCJpYXQiOjE3Mjk1MDAwMDB9..."</span>,
+  <span class="json-key">"expiresIn"</span>: <span class="json-number">3600</span>,
+  <span class="json-key">"refreshToken"</span>: <span class="json-string">"rt_abc123def456..."</span>,
+  <span class="json-key">"clientId"</span>: <span class="json-number">43</span>
+}
+            </div>
+
+            <div class="highlight">
+                <p><strong>Étape 5 :</strong> Créer un panier (temporaire)</p>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">POST</span> https://ludo-club.fr/api/v1/paniers
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+<span class="json-key">Request Body</span>:
+{
+  <span class="json-key">"clientId"</span>: <span class="json-number">43</span>
+}
+
+<span class="json-key">Response</span> (201 Created):
+{
+  <span class="json-key">"id"</span>: <span class="json-string">"panier_550"</span>,
+  <span class="json-key">"clientId"</span>: <span class="json-number">43</span>,
+  <span class="json-key">"articles"</span>: [],
+  <span class="json-key">"montantTotal"</span>: <span class="json-number">0.00</span>,
+  <span class="json-key">"dateCreation"</span>: <span class="json-string">"2025-10-21T15:00:00Z"</span>
+}
+            </div>
+
+            <div class="highlight">
+                <p><strong>Étape 6 :</strong> Ajouter des produits au panier</p>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">POST</span> https://ludo-club.fr/api/v1/paniers/panier_550/articles
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+<span class="json-key">Request Body</span>:
+{
+  <span class="json-key">"produitId"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"quantite"</span>: <span class="json-number">2</span>
+}
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"id"</span>: <span class="json-string">"panier_550"</span>,
+  <span class="json-key">"articles"</span>: [
+    {
+      <span class="json-key">"produitId"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Puzzle géographique"</span>,
+      <span class="json-key">"quantite"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"prixUnitaire"</span>: <span class="json-number">24.99</span>,
+      <span class="json-key">"sousTotal"</span>: <span class="json-number">49.98</span>
+    }
+  ],
+  <span class="json-key">"montantTotal"</span>: <span class="json-number">49.98</span>
+}
+            </div>
+
+            <div class="highlight">
+                <p><strong>Étape 7 :</strong> Passer la commande</p>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">POST</span> https://ludo-club.fr/api/v1/commandes
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+<span class="json-key">Request Body</span>:
+{
+  <span class="json-key">"panierId"</span>: <span class="json-string">"panier_550"</span>,
+  <span class="json-key">"adresseLivraison"</span>: {
+    <span class="json-key">"rue"</span>: <span class="json-string">"8 avenue des Champs"</span>,
+    <span class="json-key">"ville"</span>: <span class="json-string">"Lyon"</span>,
+    <span class="json-key">"codePostal"</span>: <span class="json-string">"69001"</span>
+  },
+  <span class="json-key">"modeLivraison"</span>: <span class="json-string">"standard"</span>,
+  <span class="json-key">"modePaiement"</span>: <span class="json-string">"carte_bancaire"</span>
+}
+
+<span class="json-key">Response</span> (201 Created):
+<span class="json-key">Location</span>: /api/v1/commandes/1002
+{
+  <span class="json-key">"id"</span>: <span class="json-number">1002</span>,
+  <span class="json-key">"clientId"</span>: <span class="json-number">43</span>,
+  <span class="json-key">"dateCommande"</span>: <span class="json-string">"2025-10-21T15:10:00Z"</span>,
+  <span class="json-key">"statut"</span>: <span class="json-string">"en_attente_paiement"</span>,
+  <span class="json-key">"montantTotal"</span>: <span class="json-number">49.98</span>,
+  <span class="json-key">"fraisLivraison"</span>: <span class="json-number">5.90</span>,
+  <span class="json-key">"montantFinal"</span>: <span class="json-number">55.88</span>,
+  <span class="json-key">"urlPaiement"</span>: <span class="json-string">"https://ludo-club.fr/paiement/1002?token=abc123"</span>,
+  <span class="json-key">"dateLivraisonEstimee"</span>: <span class="json-string">"2025-10-25"</span>
+}
+            </div>
+
+            <div class="highlight">
+                <p><strong>Étape 8 :</strong> Suivre la commande</p>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">GET</span> https://ludo-club.fr/api/v1/commandes/1002
+<span class="json-key">Authorization</span>: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"id"</span>: <span class="json-number">1002</span>,
+  <span class="json-key">"statut"</span>: <span class="json-string">"en_preparation"</span>,
+  <span class="json-key">"historiqueStatuts"</span>: [
+    {
+      <span class="json-key">"statut"</span>: <span class="json-string">"en_attente_paiement"</span>,
+      <span class="json-key">"date"</span>: <span class="json-string">"2025-10-21T15:10:00Z"</span>
+    },
+    {
+      <span class="json-key">"statut"</span>: <span class="json-string">"paiement_valide"</span>,
+      <span class="json-key">"date"</span>: <span class="json-string">"2025-10-21T15:15:00Z"</span>
+    },
+    {
+      <span class="json-key">"statut"</span>: <span class="json-string">"en_preparation"</span>,
+      <span class="json-key">"date"</span>: <span class="json-string">"2025-10-21T16:00:00Z"</span>
+    }
+  ],
+  <span class="json-key">"numeroSuivi"</span>: <span class="json-string">"LUDO-FR-1002-2025"</span>,
+  <span class="json-key">"lienSuivi"</span>: <span class="json-string">"/api/v1/commandes/1002/suivi"</span>
+}
+            </div>
+
+            <h3>6.2 Scénario : Gestion du stock par l'entrepôt</h3>
+
+            <div class="code-example">
+<span class="json-key">GET</span> https://ludo-club.fr/api/v1/stock?seuil=50
+<span class="json-key">Authorization</span>: Bearer [token_employe_entrepot]
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"produitsStockFaible"</span>: [
+    {
+      <span class="json-key">"produitId"</span>: <span class="json-number">15</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Jeu de société famille"</span>,
+      <span class="json-key">"quantiteStock"</span>: <span class="json-number">25</span>,
+      <span class="json-key">"seuilMinimum"</span>: <span class="json-number">50</span>,
+      <span class="json-key">"emplacement"</span>: <span class="json-string">"Allée C - Rayon 12"</span>,
+      <span class="json-key">"alerte"</span>: <span class="json-string">"Stock critique"</span>
+    }
+  ]
+}
+
+<span class="comment">// Mise à jour du stock après réapprovisionnement</span>
+<span class="json-key">PUT</span> https://ludo-club.fr/api/v1/stock/15
+<span class="json-key">Authorization</span>: Bearer [token_employe_entrepot]
+
+<span class="json-key">Request Body</span>:
+{
+  <span class="json-key">"quantiteAjoutee"</span>: <span class="json-number">100</span>,
+  <span class="json-key">"operation"</span>: <span class="json-string">"reapprovisionnement"</span>,
+  <span class="json-key">"referenceLivraison"</span>: <span class="json-string">"LIV-2025-456"</span>
+}
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"produitId"</span>: <span class="json-number">15</span>,
+  <span class="json-key">"quantiteStock"</span>: <span class="json-number">125</span>,
+  <span class="json-key">"dateMiseAJour"</span>: <span class="json-string">"2025-10-21T17:00:00Z"</span>,
+  <span class="json-key">"operateurId"</span>: <span class="json-number">8</span>
+}
+            </div>
+
+            <h2>7. Ressources Supplémentaires</h2>
+
+            <h3>7.1 Avis et Évaluations</h3>
+
+            <table class="resource-table">
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/produits/{id}/avis</code></td>
+                        <td>Avis sur un produit</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method post">POST</span></td>
+                        <td><code>/api/v1/produits/{id}/avis</code></td>
+                        <td>Ajouter un avis</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>7.2 Recherche et Filtrage</h3>
+
+            <div class="code-example">
+<span class="comment">// Recherche avec filtres multiples</span>
+<span class="json-key">GET</span> /api/v1/produits?
+    q=robot&
+    categorie=educatif&
+    prixMin=20&
+    prixMax=100&
+    ageMin=8&
+    enStock=true&
+    tri=prix_asc&
+    page=1&
+    limit=20
+
+<span class="comment">// Recherche avancée</span>
+<span class="json-key">POST</span> /api/v1/recherche/produits
+{
+  <span class="json-key">"motsCles"</span>: [<span class="json-string">"robot"</span>, <span class="json-string">"programmation"</span>],
+  <span class="json-key">"filtres"</span>: {
+    <span class="json-key">"categories"</span>: [<span class="json-string">"educatif"</span>, <span class="json-string">"electronique"</span>],
+    <span class="json-key">"trancheAge"</span>: {<span class="json-key">"min"</span>: <span class="json-number">8</span>, <span class="json-key">"max"</span>: <span class="json-number">14</span>},
+    <span class="json-key">"tranchePrix"</span>: {<span class="json-key">"min"</span>: <span class="json-number">30</span>, <span class="json-key">"max"</span>: <span class="json-number">80</span>}
+  },
+  <span class="json-key">"tri"</span>: <span class="json-string">"popularite"</span>
+}
+            </div>
+
+            <h3>7.3 Catalogue et Promotion</h3>
+
+            <table class="resource-table">
+                <thead>
+                    <tr>
+                        <th>Méthode</th>
+                        <th>Endpoint</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/promotions</code></td>
+                        <td>Promotions en cours</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/nouveautes</code></td>
+                        <td>Nouveaux produits</td>
+                    </tr>
+                    <tr>
+                        <td><span class="method get">GET</span></td>
+                        <td><code>/api/v1/meilleures-ventes</code></td>
+                        <td>Produits les plus vendus</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>8. Codes de Statut HTTP Utilisés</h2>
+
+            <table class="resource-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Statut</th>
+                        <th>Utilisation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>200</strong></td>
+                        <td>OK</td>
+                        <td>Requête réussie (GET, PUT)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>201</strong></td>
+                        <td>Created</td>
+                        <td>Ressource créée avec succès (POST)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>204</strong></td>
+                        <td>No Content</td>
+                        <td>Suppression réussie (DELETE)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>400</strong></td>
+                        <td>Bad Request</td>
+                        <td>Données invalides</td>
+                    </tr>
+                    <tr>
+                        <td><strong>401</strong></td>
+                        <td>Unauthorized</td>
+                        <td>Authentification requise</td>
+                    </tr>
+                    <tr>
+                        <td><strong>403</strong></td>
+                        <td>Forbidden</td>
+                        <td>Accès interdit</td>
+                    </tr>
+                    <tr>
+                        <td><strong>404</strong></td>
+                        <td>Not Found</td>
+                        <td>Ressource introuvable</td>
+                    </tr>
+                    <tr>
+                        <td><strong>409</strong></td>
+                        <td>Conflict</td>
+                        <td>Conflit (ex: stock insuffisant)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>500</strong></td>
+                        <td>Internal Server Error</td>
+                        <td>Erreur serveur</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>9. Architecture Technique</h2>
+
+            <div class="note">
+                <h3>📊 Flux de données</h3>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Client Internet</strong> → Requête HTTPS vers https://ludo-club.fr</li>
+                    <li><strong>Routeur R1</strong> (80.160.65.107) → Transfert vers R2</li>
+                    <li><strong>Pare-feu R2</strong> (179.169.10.98) → Filtrage selon les règles</li>
+                    <li><strong>Serveur Web DMZ</strong> (179.169.10.106) → Traite la requête API REST</li>
+                    <li><strong>Communication interne</strong> → Le serveur Web communique avec:
+                        <ul style="margin-left: 20px;">
+                            <li>Serveur SGBD (192.168.1.2) pour les données</li>
+                            <li>Serveur Application (192.168.1.3) pour la logique métier</li>
+                            <li>Serveur Fichiers (192.168.1.1) pour les images</li>
+                        </ul>
+                    </li>
+                    <li><strong>Réponse</strong> → Retour JSON au client via HTTPS</li>
+                </ol>
+            </div>
+
+            <h2>10. Avantages de cette Architecture</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                <div class="layer">
+                    <div class="layer-title">✅ Sécurité</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Séparation DMZ / Réseau interne</li>
+                        <li>Pare-feu filtrant (R2)</li>
+                        <li>Authentification JWT</li>
+                        <li>HTTPS obligatoire</li>
+                    </ul>
+                </div>
+                <div class="layer">
+                    <div class="layer-title">⚡ Performance</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>API RESTful légère</li>
+                        <li>Réponses JSON compactes</li>
+                        <li>Mise en cache possible</li>
+                        <li>Liens 1Gbit/s internes</li>
+                    </ul>
+                </div>
+                <div class="layer">
+                    <div class="layer-title">🔄 Évolutivité</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Architecture modulaire</li>
+                        <li>Ajout facile de ressources</li>
+                        <li>Versionnement API (/v1/)</li>
+                        <li>Séparation des préoccupations</li>
+                    </ul>
+                </div>
+                <div class="layer">
+                    <div class="layer-title">🌐 Interopérabilité</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Standards HTTP/HTTPS</li>
+                        <li>Format JSON universel</li>
+                        <li>Compatible multi-plateformes</li>
+                        <li>Accès web, mobile, API tierces</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h2>11. Gestion des Erreurs</h2>
+
+            <h3>11.1 Format Standard des Erreurs</h3>
+
+            <div class="code-example">
+<span class="comment">// Exemple: Produit non trouvé</span>
+<span class="json-key">GET</span> /api/v1/produits/9999
+
+<span class="json-key">Response</span> (404 Not Found):
+{
+  <span class="json-key">"erreur"</span>: {
+    <span class="json-key">"code"</span>: <span class="json-string">"PRODUIT_INTROUVABLE"</span>,
+    <span class="json-key">"message"</span>: <span class="json-string">"Le produit demandé n'existe pas"</span>,
+    <span class="json-key">"details"</span>: <span class="json-string">"Aucun produit avec l'ID 9999"</span>,
+    <span class="json-key">"timestamp"</span>: <span class="json-string">"2025-10-21T15:30:00Z"</span>,
+    <span class="json-key">"path"</span>: <span class="json-string">"/api/v1/produits/9999"</span>
+  }
+}
+
+<span class="comment">// Exemple: Stock insuffisant</span>
+<span class="json-key">POST</span> /api/v1/commandes
+
+<span class="json-key">Response</span> (409 Conflict):
+{
+  <span class="json-key">"erreur"</span>: {
+    <span class="json-key">"code"</span>: <span class="json-string">"STOCK_INSUFFISANT"</span>,
+    <span class="json-key">"message"</span>: <span class="json-string">"Stock insuffisant pour le produit demandé"</span>,
+    <span class="json-key">"details"</span>: {
+      <span class="json-key">"produitId"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"quantiteDemandee"</span>: <span class="json-number">250</span>,
+      <span class="json-key">"quantiteDisponible"</span>: <span class="json-number">200</span>
+    },
+    <span class="json-key">"timestamp"</span>: <span class="json-string">"2025-10-21T15:30:00Z"</span>
+  }
+}
+
+<span class="comment">// Exemple: Validation des données</span>
+<span class="json-key">POST</span> /api/v1/clients
+
+<span class="json-key">Response</span> (400 Bad Request):
+{
+  <span class="json-key">"erreur"</span>: {
+    <span class="json-key">"code"</span>: <span class="json-string">"VALIDATION_ECHOUEE"</span>,
+    <span class="json-key">"message"</span>: <span class="json-string">"Les données fournies sont invalides"</span>,
+    <span class="json-key">"details"</span>: [
+      {
+        <span class="json-key">"champ"</span>: <span class="json-string">"email"</span>,
+        <span class="json-key">"erreur"</span>: <span class="json-string">"Format d'email invalide"</span>
+      },
+      {
+        <span class="json-key">"champ"</span>: <span class="json-string">"motDePasse"</span>,
+        <span class="json-key">"erreur"</span>: <span class="json-string">"Le mot de passe doit contenir au moins 8 caractères"</span>
+      }
+    ],
+    <span class="json-key">"timestamp"</span>: <span class="json-string">"2025-10-21T15:30:00Z"</span>
+  }
+}
+
+<span class="comment">// Exemple: Non authentifié</span>
+<span class="json-key">GET</span> /api/v1/clients/42/commandes
+
+<span class="json-key">Response</span> (401 Unauthorized):
+{
+  <span class="json-key">"erreur"</span>: {
+    <span class="json-key">"code"</span>: <span class="json-string">"AUTHENTIFICATION_REQUISE"</span>,
+    <span class="json-key">"message"</span>: <span class="json-string">"Vous devez être authentifié pour accéder à cette ressource"</span>,
+    <span class="json-key">"timestamp"</span>: <span class="json-string">"2025-10-21T15:30:00Z"</span>
+  }
+}
+            </div>
+
+            <h2>12. Pagination et Performance</h2>
+
+            <h3>12.1 Pagination Standard</h3>
+
+            <div class="code-example">
+<span class="json-key">GET</span> /api/v1/produits?page=2&limit=20&tri=nom_asc
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"produits"</span>: [ <span class="comment">/* 20 produits */</span> ],
+  <span class="json-key">"pagination"</span>: {
+    <span class="json-key">"pageActuelle"</span>: <span class="json-number">2</span>,
+    <span class="json-key">"elementsParPage"</span>: <span class="json-number">20</span>,
+    <span class="json-key">"totalElements"</span>: <span class="json-number">156</span>,
+    <span class="json-key">"totalPages"</span>: <span class="json-number">8</span>,
+    <span class="json-key">"premierePage"</span>: <span class="json-string">"/api/v1/produits?page=1&limit=20"</span>,
+    <span class="json-key">"pagePrecedente"</span>: <span class="json-string">"/api/v1/produits?page=1&limit=20"</span>,
+    <span class="json-key">"pageSuivante"</span>: <span class="json-string">"/api/v1/produits?page=3&limit=20"</span>,
+    <span class="json-key">"dernierePage"</span>: <span class="json-string">"/api/v1/produits?page=8&limit=20"</span>
+  }
+}
+            </div>
+
+            <h3>12.2 Champs Partiels (Projection)</h3>
+
+            <div class="code-example">
+<span class="comment">// Récupérer uniquement certains champs</span>
+<span class="json-key">GET</span> /api/v1/produits?champs=id,nom,prix
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"produits"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Robot éducatif"</span>,
+      <span class="json-key">"prix"</span>: <span class="json-number">49.99</span>
+    },
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"nom"</span>: <span class="json-string">"Puzzle géographique"</span>,
+      <span class="json-key">"prix"</span>: <span class="json-number">24.99</span>
+    }
+  ]
+}
+            </div>
+
+            <h2>13. HATEOAS - Hypermedia As The Engine Of Application State</h2>
+
+            <div class="note">
+                <h3>🔗 Principe HATEOAS</h3>
+                <p>
+                    L'API fournit des liens vers les ressources associées, permettant aux clients 
+                    de naviguer dans l'API de manière dynamique sans connaître préalablement toutes les URIs.
+                </p>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">GET</span> /api/v1/commandes/1002
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"id"</span>: <span class="json-number">1002</span>,
+  <span class="json-key">"statut"</span>: <span class="json-string">"en_preparation"</span>,
+  <span class="json-key">"montantTotal"</span>: <span class="json-number">55.88</span>,
+  <span class="json-key">"_links"</span>: {
+    <span class="json-key">"self"</span>: {
+      <span class="json-key">"href"</span>: <span class="json-string">"/api/v1/commandes/1002"</span>
+    },
+    <span class="json-key">"client"</span>: {
+      <span class="json-key">"href"</span>: <span class="json-string">"/api/v1/clients/43"</span>
+    },
+    <span class="json-key">"articles"</span>: {
+      <span class="json-key">"href"</span>: <span class="json-string">"/api/v1/commandes/1002/articles"</span>
+    },
+    <span class="json-key">"suivi"</span>: {
+      <span class="json-key">"href"</span>: <span class="json-string">"/api/v1/commandes/1002/suivi"</span>
+    },
+    <span class="json-key">"facture"</span>: {
+      <span class="json-key">"href"</span>: <span class="json-string">"/api/v1/commandes/1002/facture"</span>
+    },
+    <span class="json-key">"annuler"</span>: {
+      <span class="json-key">"href"</span>: <span class="json-string">"/api/v1/commandes/1002/annulation"</span>,
+      <span class="json-key">"method"</span>: <span class="json-string">"POST"</span>,
+      <span class="json-key">"disponible"</span>: <span class="json-number">true</span>
+    }
+  }
+}
+            </div>
+
+            <h2>14. Webhooks et Notifications</h2>
+
+            <h3>14.1 Configuration des Webhooks</h3>
+
+            <div class="code-example">
+<span class="comment">// Enregistrer un webhook pour les changements de statut</span>
+<span class="json-key">POST</span> /api/v1/webhooks
+<span class="json-key">Authorization</span>: Bearer [admin_token]
+
+<span class="json-key">Request Body</span>:
+{
+  <span class="json-key">"url"</span>: <span class="json-string">"https://mon-systeme.fr/webhook/commandes"</span>,
+  <span class="json-key">"evenements"</span>: [
+    <span class="json-string">"commande.creee"</span>,
+    <span class="json-string">"commande.paiement_valide"</span>,
+    <span class="json-key">"commande.expediee"</span>,
+    <span class="json-string">"commande.livree"</span>
+  ],
+  <span class="json-key">"actif"</span>: <span class="json-number">true</span>
+}
+
+<span class="json-key">Response</span> (201 Created):
+{
+  <span class="json-key">"id"</span>: <span class="json-string">"webhook_123"</span>,
+  <span class="json-key">"url"</span>: <span class="json-string">"https://mon-systeme.fr/webhook/commandes"</span>,
+  <span class="json-key">"secret"</span>: <span class="json-string">"whsec_abc123def456..."</span>,
+  <span class="json-key">"dateCreation"</span>: <span class="json-string">"2025-10-21T16:00:00Z"</span>
+}
+
+<span class="comment">// Exemple de notification webhook envoyée</span>
+<span class="json-key">POST</span> https://mon-systeme.fr/webhook/commandes
+<span class="json-key">X-Ludo-Signature</span>: sha256=abc123...
+<span class="json-key">X-Ludo-Event</span>: commande.expediee
+
+{
+  <span class="json-key">"evenement"</span>: <span class="json-string">"commande.expediee"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-string">"2025-10-22T10:00:00Z"</span>,
+  <span class="json-key">"donnees"</span>: {
+    <span class="json-key">"commandeId"</span>: <span class="json-number">1002</span>,
+    <span class="json-key">"statut"</span>: <span class="json-string">"expediee"</span>,
+    <span class="json-key">"numeroSuivi"</span>: <span class="json-string">"LUDO-FR-1002-2025"</span>,
+    <span class="json-key">"transporteur"</span>: <span class="json-string">"Colissimo"</span>
+  }
+}
+            </div>
+
+            <h2>15. Documentation API Interactive</h2>
+
+            <div class="highlight">
+                <h3>📖 Endpoints de Documentation</h3>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>GET /api/v1/docs</strong> - Documentation HTML interactive</li>
+                    <li><strong>GET /api/v1/openapi.json</strong> - Spécification OpenAPI 3.0</li>
+                    <li><strong>GET /api/v1/health</strong> - État de santé de l'API</li>
+                    <li><strong>GET /api/v1/version</strong> - Version de l'API</li>
+                </ul>
+            </div>
+
+            <div class="code-example">
+<span class="json-key">GET</span> /api/v1/health
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"statut"</span>: <span class="json-string">"operational"</span>,
+  <span class="json-key">"version"</span>: <span class="json-string">"1.0.0"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-string">"2025-10-21T16:30:00Z"</span>,
+  <span class="json-key">"services"</span>: {
+    <span class="json-key">"baseDeDonnees"</span>: <span class="json-string">"operational"</span>,
+    <span class="json-key">"cache"</span>: <span class="json-string">"operational"</span>,
+    <span class="json-key">"messagerie"</span>: <span class="json-string">"operational"</span>
+  },
+  <span class="json-key">"uptime"</span>: <span class="json-number">99.98</span>
+}
+
+<span class="json-key">GET</span> /api/v1/version
+
+<span class="json-key">Response</span> (200 OK):
+{
+  <span class="json-key">"api"</span>: <span class="json-string">"Ludo E-commerce API"</span>,
+  <span class="json-key">"version"</span>: <span class="json-string">"1.0.0"</span>,
+  <span class="json-key">"dateVersion"</span>: <span class="json-string">"2025-10-01"</span>,
+  <span class="json-key">"serveur"</span>: <span class="json-string">"179.169.10.106"</span>,
+  <span class="json-key">"environnement"</span>: <span class="json-string">"production"</span>
+}
+            </div>
+
+            <h2>16. Bonnes Pratiques Appliquées</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                <div class="layer">
+                    <div class="layer-title">✓ Conception API</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>URIs au pluriel</li>
+                        <li>Versionnement (/v1/)</li>
+                        <li>Codes HTTP appropriés</li>
+                        <li>Format JSON standard</li>
+                        <li>HATEOAS pour navigation</li>
+                    </ul>
+                </div>
+                <div class="layer">
+                    <div class="layer-title">✓ Sécurité</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>HTTPS obligatoire</li>
+                        <li>JWT pour authentification</li>
+                        <li>Validation des entrées</li>
+                        <li>Rate limiting</li>
+                        <li>Pare-feu applicatif</li>
+                    </ul>
+                </div>
+                <div class="layer">
+                    <div class="layer-title">✓ Performance</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Pagination systématique</li>
+                        <li>Compression gzip</li>
+                        <li>Cache HTTP</li>
+                        <li>Projection de champs</li>
+                        <li>CDN pour médias</li>
+                    </ul>
+                </div>
+                <div class="layer">
+                    <div class="layer-title">✓ Documentation</div>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Documentation interactive</li>
+                        <li>Spécification OpenAPI</li>
+                        <li>Exemples de code</li>
+                        <li>Guide de démarrage</li>
+                        <li>Changelog public</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h2>17. Résumé de l'Architecture</h2>
+
+            <div class="architecture-diagram">
+                <h3 style="color: #1e3c72; margin-bottom: 20px;">📊 Vue d'Ensemble</h3>
+                
+                <div style="text-align: left; max-width: 800px; margin: 0 auto;">
+                    <p><strong>Serveur Web (DMZ) - 179.169.10.106</strong></p>
+                    <ul style="margin-left: 30px;">
+                        <li>API REST en HTTPS</li>
+                        <li>Authentification JWT</li>
+                        <li>Gestion des requêtes clients</li>
+                        <li>Exposition publique contrôlée</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px;"><strong>Ressources Principales</strong></p>
+                    <ul style="margin-left: 30px;">
+                        <li>/api/v1/produits - Catalogue jouets</li>
+                        <li>/api/v1/clients - Comptes utilisateurs</li>
+                        <li>/api/v1/commandes - Gestion commandes</li>
+                        <li>/api/v1/stock - Gestion entrepôt</li>
+                        <li>/api/v1/categories - Organisation produits</li>
+                        <li>/api/v1/paniers - Paniers d'achat</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px;"><strong>Services Internes</strong></p>
+                    <ul style="margin-left: 30px;">
+                        <li>SGBD (192.168.1.2) - Données persistantes</li>
+                        <li>Serveur Application (192.168.1.3) - Logique métier</li>
+                        <li>Serveur Fichiers (192.168.1.1) - Images, documents</li>
+                        <li>DHCP (192.168.1.4) - Configuration réseau</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h2>18. Conclusion</h2>
+
+            <div class="note">
+                <h3>🎯 Points Clés</h3>
+                <p>
+                    L'architecture REST mise en place pour Ludo offre une solution moderne, 
+                    sécurisée et évolutive pour le commerce électronique:
+                </p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Centralité des ressources:</strong> Chaque entité métier (produit, client, commande) 
+                    est exposée comme une ressource accessible via des URIs standardisés</li>
+                    <li><strong>Sécurité multicouche:</strong> DMZ isolée, pare-feu R2, authentification JWT, 
+                    HTTPS obligatoire</li>
+                    <li><strong>Performance optimisée:</strong> Liaisons 1Gbit/s, pagination, cache HTTP, 
+                    compression</li>
+                    <li><strong>Évolutivité:</strong> Versionnement API, architecture modulaire, ajout facile 
+                    de nouvelles ressources</li>
+                    <li><strong>Interopérabilité:</strong> Standards web (HTTP, JSON), compatible avec tout 
+                    type de client (web, mobile, API tierces)</li>
+                </ul>
+                <p style="margin-top: 15px;">
+                    Cette architecture permet à Ludo de passer d'un modèle traditionnel de vente 
+                    par correspondance à une plateforme e-commerce moderne, tout en maintenant 
+                    la sécurité du réseau interne et en offrant une expérience utilisateur fluide.
+                </p>
+            </div>
+
+            <div style="text-align: center; margin: 40px 0; padding: 30px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); border-radius: 10px; color: white;">
+                <h3 style="color: white; margin-bottom: 15px;">🚀 API Ludo - Architecture Centrée Ressources</h3>
+                <p style="font-size: 1.1em;">Simplicité • Sécurité • Performance • Évolutivité</p>
+                <p style="margin-top: 10px; opacity: 0.9;">Base URL: https://ludo-club.fr/api/v1</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

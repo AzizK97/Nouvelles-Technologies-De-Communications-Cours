@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemples PDF</title>
+    <style>
+        * {margin: 0; padding: 0; box-sizing: border-box;}
+        body {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px;}
+        .container {max-width: 1400px; margin: 0 auto;}
+        header {background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 30px; text-align: center;}
+        h1 {color: #667eea; font-size: 2.5em; margin-bottom: 10px;}
+        nav {background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 30px;}
+        nav ul {list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;}
+        nav a {text-decoration: none; color: white; padding: 12px 25px; border-radius: 8px; background: #667eea; transition: all 0.3s; font-weight: 500;}
+        nav a:hover {background: #764ba2; transform: translateY(-2px);}
+        .content {background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); min-height: 600px;}
+        .pdf-section {margin-bottom: 40px;}
+        .pdf-section h2 {color: #667eea; margin-bottom: 20px; font-size: 1.8em;}
+        .pdf-viewer {width: 100%; height: 800px; border: 2px solid #e0e0e0; border-radius: 8px; margin-top: 20px;}
+        .info-box {background: #f0f0f0; padding: 20px; border-radius: 8px; margin-bottom: 30px;}
+        .info-box h3 {color: #764ba2; margin-bottom: 15px;}
+        .info-box p {color: #666; line-height: 1.6; margin-bottom: 10px;}
+        .file-list {list-style: none; margin-top: 20px;}
+        .file-list li {background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; margin: 10px 0; border-radius: 8px; cursor: pointer; transition: transform 0.3s;}
+        .file-list li:hover {transform: translateX(10px);}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Exemples et Documents PDF</h1>
+        </header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="synchro-distru.html">Synch Des Sys Distr</a></li>
+                <li><a href="architecture-rest.html">Architecture REST</a></li>
+                <li><a href="event-driven.html">Event-Driven Architecture</a></li>
+                <li><a href="nouvelles-tech.html">Nouvelles Technologies</a></li>
+                <li><a href="synchronisation.html">Synchronisation</a></li>
+                <li><a href="exemples.html">Exemples PDF</a></li>
+            </ul>
+        </nav>
+        <div class="content">
+            <div class="info-box">
+                <h3>Documents PDF</h3>
+            </div>
+
+            <div class="pdf-section">
+
+                <iframe src="public/Exemple-architecture.pdf" class="pdf-viewer"></iframe> 
+                <iframe src="public/Ludo-Plan.pdf" class="pdf-viewer"></iframe> 
+            </div>
+        </div>
+    </div>
+</body>
+</html>

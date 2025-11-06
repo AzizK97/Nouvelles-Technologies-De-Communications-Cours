@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelles Technologies de Réseaux - 1h30</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .slide {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            page-break-after: always;
+            min-height: 600px;
+        }
+        
+        .slide-number {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .title-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .title-slide h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        
+        .title-slide .subtitle {
+            font-size: 1.5em;
+            opacity: 0.9;
+        }
+        
+        .title-slide .info {
+            margin-top: 40px;
+            font-size: 1.1em;
+        }
+        
+        h2 {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        
+        h3 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        h4 {
+            color: #667eea;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        
+        li {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        
+        .box {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .diagram {
+            background: white;
+            border: 2px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+        
+        .diagram pre {
+            text-align: left;
+            display: inline-block;
+            line-height: 1.4;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .key-point {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        
+        .example {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline-item {
+            padding: 15px 20px;
+            border-left: 3px solid #667eea;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-item strong {
+            color: #667eea;
+            font-size: 1.2em;
+        }
+        
+        @media print {
+            .slide {
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SLIDE 1 : TITRE -->
+    <div class="slide title-slide">
+        <h1>🌐 Nouvelles Technologies de Réseaux</h1>
+        <div class="subtitle">Et Systèmes Répartis</div>
+        <div class="info">
+            <p>Durée : 1h30</p>
+            <p>Niveau : Débutant en Systèmes Répartis</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 2 : PLAN DU COURS -->
+    <div class="slide">
+        <div class="slide-number">2/25</div>
+        <h2>📋 Plan du Cours</h2>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <strong>0-15 min :</strong> Rappels Systèmes Répartis
+            </div>
+            <div class="timeline-item">
+                <strong>15-30 min :</strong> Software Defined Networking (SDN)
+            </div>
+            <div class="timeline-item">
+                <strong>30-45 min :</strong> Network Function Virtualization (NFV)
+            </div>
+            <div class="timeline-item">
+                <strong>45-60 min :</strong> Edge Computing & 5G
+            </div>
+            <div class="timeline-item">
+                <strong>60-75 min :</strong> Service Mesh & Microservices
+            </div>
+            <div class="timeline-item">
+                <strong>75-90 min :</strong> Cas Pratiques & Questions
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 3 : RAPPELS SYSTÈMES RÉPARTIS -->
+    <div class="slide">
+        <div class="slide-number">3/25</div>
+        <h2>🔄 Rappel : Qu'est-ce qu'un Système Réparti ?</h2>
+        
+        <div class="highlight">
+            <h3 style="color: white; margin-top: 0;">Définition</h3>
+            <p>Un système réparti est un ensemble de <strong>machines indépendantes</strong> qui apparaissent à l'utilisateur comme un <strong>système unique et cohérent</strong>.</p>
+        </div>
+
+        <h3>Caractéristiques Clés</h3>
+        <ul>
+            <li><strong>Concurrence :</strong> Plusieurs processus s'exécutent simultanément</li>
+            <li><strong>Absence d'horloge globale :</strong> Pas de synchronisation parfaite</li>
+            <li><strong>Pannes indépendantes :</strong> Une machine peut tomber sans affecter les autres</li>
+            <li><strong>Communication par messages :</strong> Les machines communiquent via le réseau</li>
+        </ul>
+
+        <div class="diagram">
+            <pre>
+┌──────────┐     ┌──────────┐     ┌──────────┐
+│ Machine A│◄───►│ Machine B│◄───►│ Machine C│
+└──────────┘     └──────────┘     └──────────┘
+     ▲                 ▲                 ▲
+     └─────────────────┴─────────────────┘
+              Réseau de Communication
+            </pre>
+        </div>
+    </div>
+
+    <!-- SLIDE 4 : PROBLÈMES CLASSIQUES -->
+    <div class="slide">
+        <div class="slide-number">4/25</div>
+        <h2>⚠️ Défis des Systèmes Répartis</h2>
+        
+        <div class="two-columns">
+            <div>
+                <h3>Défis Techniques</h3>
+                <ul>
+                    <li><strong>Latence réseau</strong> : Communication lente</li>
+                    <li><strong>Pannes partielles</strong> : Une machine tombe</li>
+                    <li><strong>Cohérence</strong> : Garder les données synchronisées</li>
+                    <li><strong>Concurrence</strong> : Gérer les accès simultanés</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Solutions Existantes</h3>
+                <ul>
+                    <li><strong>Réplication</strong> : Copier les données</li>
+                    <li><strong>Consensus</strong> : Algorithmes (Raft, Paxos)</li>
+                    <li><strong>Load Balancing</strong> : Répartir la charge</li>
+                    <li><strong>Tolérance aux pannes</strong> : Redondance</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="key-point">
+            <strong>💡 Point Clé :</strong> Les nouvelles technologies de réseaux visent à résoudre ces défis en rendant le réseau plus <strong>intelligent</strong>, <strong>flexible</strong> et <strong>programmable</strong>.
+        </div>
+    </div>
+
+    <!-- SLIDE 5 : EVOLUTION DES RESEAUX -->
+    <div class="slide">
+        <div class="slide-number">5/25</div>
+        <h2>📈 Évolution des Réseaux</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Époque</th>
+                    <th>Type de Réseau</th>
+                    <th>Caractéristique</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1990s</strong></td>
+                    <td>Réseaux traditionnels</td>
+                    <td>Équipements matériels fixes, configuration manuelle</td>
+                </tr>
+                <tr>
+                    <td><strong>2000s</strong></td>
+                    <td>Virtualisation serveurs</td>
+                    <td>VMware, VirtualBox - Découplage logiciel/matériel</td>
+                </tr>
+                <tr>
+                    <td><strong>2010s</strong></td>
+                    <td>Cloud Computing</td>
+                    <td>AWS, Azure, GCP - Infrastructure as a Service</td>
+                </tr>
+                <tr>
+                    <td><strong>2015+</strong></td>
+                    <td>SDN/NFV</td>
+                    <td>Réseaux programmables et virtualisés</td>
+                </tr>
+                <tr>
+                    <td><strong>2020+</strong></td>
+                    <td>Edge/5G/Mesh</td>
+                    <td>Réseaux distribués intelligents</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="highlight">
+            <p><strong>Tendance :</strong> Du matériel figé vers le logiciel flexible</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 6 : SDN - INTRO -->
+    <div class="slide">
+        <div class="slide-number">6/25</div>
+        <h2>🎛️ Software Defined Networking (SDN)</h2>
+        
+        <h3>Qu'est-ce que le SDN ?</h3>
+        <div class="box">
+            <p>Le SDN est une approche qui <strong>sépare le plan de contrôle</strong> (décisions de routage) du <strong>plan de données</strong> (transfert effectif des paquets).</p>
+        </div>
+
+        <h3>Réseau Traditionnel vs SDN</h3>
+        <div class="two-columns">
+            <div>
+                <h4>Réseau Traditionnel</h4>
+                <div class="diagram">
+                    <pre>
+┌─────────────────┐
+│  Switch/Router  │
+├─────────────────┤
+│ Control Plane   │ ← Intégré
+│ Data Plane      │
+└─────────────────┘
+    Équipement figé
+    Config manuelle
+                    </pre>
+                </div>
+            </div>
+            <div>
+                <h4>SDN</h4>
+                <div class="diagram">
+                    <pre>
+┌─────────────────┐
+│   Controller    │ ← Centralisé
+│  (Logiciel)     │
+└────────┬────────┘
+         │ API
+    ┌────┴────┐
+    │         │
+┌───▼───┐ ┌──▼────┐
+│Switch │ │Switch │
+│(Data) │ │(Data) │
+└───────┘ └───────┘
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 7 : ARCHITECTURE SDN -->
+    <div class="slide">
+        <div class="slide-number">7/25</div>
+        <h2>🏗️ Architecture SDN en 3 Couches</h2>
+        
+        <div class="diagram">
+            <pre>
+┌─────────────────────────────────────────────────────────┐
+│         APPLICATION LAYER (Couche Application)          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
+│  │ Firewall App │  │ Load Balancer│  │   Routing    │ │
+│  └──────────────┘  └──────────────┘  └──────────────┘ │
+└────────────────────────┬────────────────────────────────┘
+                         │ Northbound API (REST)
+┌────────────────────────▼────────────────────────────────┐
+│         CONTROL LAYER (Contrôleur SDN)                  │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │  ODL / ONOS / Floodlight / Ryu                  │   │
+│  └─────────────────────────────────────────────────┘   │
+└────────────────────────┬────────────────────────────────┘
+                         │ Southbound API (OpenFlow)
+┌────────────────────────▼────────────────────────────────┐
+│         DATA LAYER (Infrastructure)                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐             │
+│  │ Switch 1 │  │ Switch 2 │  │ Switch 3 │             │
+│  └──────────┘  └──────────┘  └──────────┘             │
+└─────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+
+        <div class="two-columns">
+            <div class="box">
+                <h4>Northbound API</h4>
+                <p>Interface entre contrôleur et applications (REST, Python)</p>
+            </div>
+            <div class="box">
+                <h4>Southbound API</h4>
+                <p>Interface entre contrôleur et switches (OpenFlow)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 8 : OPENFLOW -->
+    <div class="slide">
+        <div class="slide-number">8/25</div>
+        <h2>🔌 OpenFlow : Le Protocole SDN</h2>
+        
+        <h3>Principe de Fonctionnement</h3>
+        <div class="box">
+            <p>OpenFlow permet au contrôleur de <strong>programmer dynamiquement</strong> les tables de flux des switches.</p>
+        </div>
+
+        <h3>Table de Flux (Flow Table)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Match Fields</th>
+                    <th>Priority</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>IP src: 192.168.1.10<br>Port: 80</td>
+                    <td>100</td>
+                    <td>Forward → Port 2</td>
+                </tr>
+                <tr>
+                    <td>IP dst: 10.0.0.5<br>Protocol: TCP</td>
+                    <td>90</td>
+                    <td>Drop</td>
+                </tr>
+                <tr>
+                    <td>MAC: *<br>VLAN: 100</td>
+                    <td>50</td>
+                    <td>Forward → Port 1</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="example">
+            <h4>📌 Exemple : Premier Paquet</h4>
+            <ol>
+                <li>Un paquet arrive au switch</li>
+                <li>Aucune règle ne correspond → Envoi au contrôleur</li>
+                <li>Contrôleur décide : "Forward ce flux vers port 3"</li>
+                <li>Contrôleur installe la règle dans le switch</li>
+                <li>Paquets suivants traités directement par le switch</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- SLIDE 9 : AVANTAGES SDN -->
+    <div class="slide">
+        <div class="slide-number">9/25</div>
+        <h2>✅ Avantages et Cas d'Usage du SDN</h2>
+        
+        <h3>Avantages</h3>
+        <div class="two-columns">
+            <div>
+                <ul>
+                    <li><strong>Programmabilité</strong> : Configuration par code</li>
+                    <li><strong>Centralisation</strong> : Vue globale du réseau</li>
+                    <li><strong>Automatisation</strong> : Scripts, APIs</li>
+                    <li><strong>Innovation</strong> : Nouvelles applications réseau</li>
+                </ul>
+            </div>
+            <div>
+                <ul>
+                    <li><strong>Flexibilité</strong> : Changements rapides</li>
+                    <li><strong>Coûts réduits</strong> : Matériel générique</li>
+                    <li><strong>Sécurité</strong> : Politiques dynamiques</li>
+                    <li><strong>QoS</strong> : Gestion fine du trafic</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Cas d'Usage</h3>
+        <div class="box">
+            <h4>1. Data Centers (Google, Facebook)</h4>
+            <p>Gestion dynamique de millions de serveurs</p>
+        </div>
+        <div class="box">
+            <h4>2. Campus Universitaires</h4>
+            <p>Segmentation automatique des réseaux étudiants</p>
+        </div>
+        <div class="box">
+            <h4>3. Opérateurs Télécoms</h4>
+            <p>Optimisation du routage en temps réel</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 10 : NFV - INTRO -->
+    <div class="slide">
+        <div class="slide-number">10/25</div>
+        <h2>📦 Network Function Virtualization (NFV)</h2>
+        
+        <h3>Qu'est-ce que NFV ?</h3>
+        <div class="highlight">
+            <p>NFV consiste à <strong>virtualiser les fonctions réseau</strong> traditionnellement exécutées sur du matériel dédié (appliances).</p>
+        </div>
+
+        <h3>Transformation</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fonction</th>
+                    <th>Avant (Hardware)</th>
+                    <th>Après (NFV)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Firewall</strong></td>
+                    <td>Boîtier physique Cisco/Fortinet</td>
+                    <td>VM ou Container</td>
+                </tr>
+                <tr>
+                    <td><strong>Load Balancer</strong></td>
+                    <td>F5 Hardware Appliance</td>
+                    <td>NGINX/HAProxy virtualisé</td>
+                </tr>
+                <tr>
+                    <td><strong>Router</strong></td>
+                    <td>Routeur physique dédié</td>
+                    <td>vRouter (software)</td>
+                </tr>
+                <tr>
+                    <td><strong>IDS/IPS</strong></td>
+                    <td>Snort sur appliance</td>
+                    <td>Snort dans un container</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SLIDE 11 : ARCHITECTURE NFV -->
+    <div class="slide">
+        <div class="slide-number">11/25</div>
+        <h2>🏗️ Architecture NFV</h2>
+        
+        <div class="diagram">
+            <pre>
+┌────────────────────────────────────────────────────────┐
+│              OSS/BSS (Operational Support)             │
+└───────────────────────┬────────────────────────────────┘
+                        │
+┌───────────────────────▼────────────────────────────────┐
+│           NFV Management & Orchestration (MANO)        │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │
+│  │  Orchestrator│  │   VNF Mgr    │  │   VIM      │  │
+│  └──────────────┘  └──────────────┘  └────────────┘  │
+└───────────────────────┬────────────────────────────────┘
+                        │
+┌───────────────────────▼────────────────────────────────┐
+│         NFVI (NFV Infrastructure)                      │
+│  ┌────────────────────────────────────────────────┐   │
+│  │  VNF 1     VNF 2     VNF 3     VNF 4          │   │
+│  │ (Firewall) (Router) (LB)     (Cache)          │   │
+│  └────────────────────────────────────────────────┘   │
+│  ┌────────────────────────────────────────────────┐   │
+│  │        Hypervisor (KVM, VMware, Docker)        │   │
+│  └────────────────────────────────────────────────┘   │
+│  ┌────────────────────────────────────────────────┐   │
+│  │     Hardware (Compute, Storage, Network)       │   │
+│  └────────────────────────────────────────────────┘   │
+└────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+
+        <div class="key-point">
+            <strong>VNF (Virtual Network Function) :</strong> Une fonction réseau virtualisée (ex: vFirewall, vRouter)
+        </div>
+    </div>
+
+    <!-- SLIDE 12 : SDN vs NFV -->
+    <div class="slide">
+        <div class="slide-number">12/25</div>
+        <h2>🔄 SDN vs NFV : Quelle Différence ?</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>SDN</th>
+                    <th>NFV</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Objectif</strong></td>
+                    <td>Rendre le réseau programmable</td>
+                    <td>Virtualiser les fonctions réseau</td>
+                </tr>
+                <tr>
+                    <td><strong>Cible</strong></td>
+                    <td>Switches, routeurs (data plane)</td>
+                    <td>Appliances (firewalls, LB, etc.)</td>
+                </tr>
+                <tr>
+                    <td><strong>Architecture</strong></td>
+                    <td>Séparation contrôle/données</td>
+                    <td>Virtualisation sur hardware générique</td>
+                </tr>
+                <tr>
+                    <td><strong>Protocole clé</strong></td>
+                    <td>OpenFlow</td>
+                    <td>Pas de protocole spécifique</td>
+                </tr>
+                <tr>
+                    <td><strong>Origine</strong></td>
+                    <td>Recherche académique (Stanford)</td>
+                    <td>Opérateurs télécoms (ETSI)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="highlight">
+            <h3 style="color: white; margin-top: 0;">Complémentaires !</h3>
+            <p>SDN contrôle le réseau, NFV virtualise les fonctions → Souvent utilisés ensemble</p>
+        </div>
+
+        <div class="example">
+            <strong>Exemple :</strong> Un contrôleur SDN peut orchestrer des VNFs (fonctions virtualisées) pour créer un service réseau complet.
+        </div>
+    </div>
+
+    <!-- SLIDE 13 : EDGE COMPUTING -->
+    <div class="slide">
+        <div class="slide-number">13/25</div>
+        <h2>⚡ Edge Computing</h2>
+        
+        <h3>Du Cloud au Edge</h3>
+        <div class="diagram">
+            <pre>
+Cloud Computing (Centralisé)          Edge Computing (Distribué)
+
+    [Utilisateurs]                        [Utilisateurs]
+         │                                      │
+         │ Latence élevée                       │ Latence faible
+         ▼                                      ▼
+  ┌─────────────┐                      ┌───────────┐
+  │ Data Center │                      │Edge Server│ ← Proche
+  │  (distant)  │                      │  (local)  │
+  └─────────────┘                      └─────┬─────┘
+                                             │
+                                       ┌─────▼─────┐
+                                       │   Cloud   │
+                                       │ (agrégé)  │
+                                       └───────────┘
+            </pre>
+        </div>
+
+        <h3>Principe</h3>
+        <div class="box">
+            <p>Déplacer le calcul et le stockage <strong>plus près des utilisateurs/devices</strong> plutôt que tout centraliser dans le cloud.</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 14 : POURQUOI EDGE -->
+    <div class="slide">
+        <div class="slide-number">14/25</div>
+        <h2>🎯 Pourquoi l'Edge Computing ?</h2>
+        
+        <h3>Problèmes du Cloud Centralisé</h3>
+        <ul>
+            <li><strong>Latence :</strong> 50-100ms vers le cloud (inacceptable pour IoT, véhicules autonomes)</li>
+            <li><strong>Bande passante :</strong> Coût élevé pour envoyer toutes les données au cloud</li>
+            <li><strong>Confidentialité :</strong> Données sensibles envoyées loin</li>
+            <li><strong>Fiabilité :</strong> Dépendance à la connexion Internet</li>
+        </ul>
+
+        <h3>Avantages de l'Edge</h3>
+        <div class="two-columns">
+            <div class="box">
+                <h4>🚀 Latence Ultra-Faible</h4>
+                <p>1-10ms (vs 50-100ms cloud)</p>
+            </div>
+            <div class="box">
+                <h4>💾 Économie de Bande Passante</h4>
+                <p>Traitement local, seuls les résultats au cloud</p>
+            </div>
+        </div>
+        <div class="two-columns">
+            <div class="box">
+                <h4>🔒 Confidentialité</h4>
+                <p>Données restent locales</p>
+            </div>
+            <div class="box">
+                <h4>⚡ Résilience</h4>
+                <p>Fonctionne même sans Internet</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 15 : CAS USAGE EDGE -->
+    <div class="slide">
+        <div class="slide-number">15/25</div>
+        <h2>📱 Cas d'Usage Edge Computing</h2>
+        
+        <div class="example">
+            <h4>1. Vé
